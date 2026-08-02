@@ -1,19 +1,26 @@
 # Byte-compiled / optimized / DLL files
-utils/__pycache__/
-.pyc
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+.idea/
 # Web drivers - necessary for Selenium version of scraping
-.exe
+*.exe
 # Env variables such as path
 .env
 # venv = virtual environment
-venv
+.venv/
+venv/
 # My personal notes and TODOs
 notes.md
-.png
-.pbix
+*.png
+*.pbix
 # data collection - with exception of testing data?
 /data_*/
-.db
+*.db
 all_data.db
 # Logs
 scraping.log

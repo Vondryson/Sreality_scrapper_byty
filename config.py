@@ -1,10 +1,11 @@
 from dotenv import load_dotenv
 import os
+from pathlib import Path
 
 class Config:
     
     def __init__(self):
-        load_dotenv()
+        load_dotenv(Path(__file__).resolve().with_name(".env"))
         
         self.project_path = os.getenv("project_path") 
         self.data_folder = os.getenv("data_folder")  
