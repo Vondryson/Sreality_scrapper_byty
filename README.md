@@ -1,35 +1,81 @@
-# Sreality
-#### Web-scraping Project - costs of houses in the Czech Republic on the biggest real-estate web - "Sreality.cz"
-## OLD INFO:
-* Approximately 12.000 items scraped every week and added to total - "data_prodej_byty_souhrn.xlsx"
-* PowerBI file with some interactive visualizations for 29.3.20-1.3.201 - "Vizualizace.pbix"
-* Four notebooks: Scraper, Cleaning & Dropping, Visualizaton, and All in one.
-* To run scraping, one needs to have an up-to-date chromedriver.exe in the same folder as Jupyter notebook
+# Sreality Chaty Tracker
 
-## NEW INFO:
-### Structure of this project:
-- MakeFile
-- Requirements: 
-- scraper: responsible for obtaining the data, there are few options: ...
-- utils: ..., Geodata 
-- db_managment: ..
-#### xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-* 12.3.- 22.4.2020 = First outputs, preparation of the automatized process.
-* 24.-26.4. Visualizations in PowerBI
-* 27.-28.4. Creating representative .ipynb files with comments
-* TO be Done: Many things, mentioned in the files (full automatization, reporting, historical prices via Insidero?, checks, better time estimates, GPS smoothing, better way to handle extreme values, ...)
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-* spring 2024: started rework of the scraper
-* 11.4. extreme speed-up of getting offer details using different API call with filters
-* 14-17.4. complete table managment
-* 18.4. config with db structures and code translations, Inserting and Updating Estate details
-* 19.4. Dealing with randomized data bcs of missing header
-* 20.4. Solved translation of GPS into Kraj-Okres-Město-Oblast
-* 21.4. creating estate_detail check, individual scraper for missing estate details, change of estate_detail table structure
-* 23.4. downloaded details to all current offers, updating this db after each new scraping
-* 24.-25.4. applied logging, requirements.in and Makefile
-* 26.4. new class for Geodata handling
-* 29.4. Preparing and inserting estate_details into DB
-* 30.4. Preparing and inserting Price history into DB
-* 1.5. Complete run with scraping missing details and updating DB
-* 3.5. Logging significantly improved
+Neveřejná aplikace pro dlouhodobou analýzu chat a chalup nabízených k prodeji na Sreality.cz. Produktový rozsah a cílovou architekturu určuje [specifikace](specifikace.md), pořadí práce [roadmapa](roadmap.md) a aktuální stav [progres](progres.md).
+
+Projekt je ve fázi M0 – ověření zdroje, dat a nákladů. Původní scraper z roku 2024 zůstává dočasně v kořenových souborech a adresářích jako referenční legacy implementace; nový produkční kód vzniká odděleně v `backend/`.
+
+## Cílová struktura
+
+```text
+backend/
+  src/sreality_tracker/   Python backend, scraper a datová pipeline
+  tests/                  unit a integrační testy
+frontend/                 Next.js aplikace (inicializace v M3-01)
+infra/terraform/          GCP infrastruktura (implementace od M4-02)
+docs/adr/                 architektonická rozhodnutí
+scripts/                  bezpečné pomocné a validační skripty
+```
+
+Kořenové `scraper/`, `db_managment/`, `utils/`, `run.py`, `run_scheduled.py`, `config.py` a `old version/` jsou původní kód. Nové moduly je nesmějí importovat.
+
+## Požadovaný toolchain
+
+- Python 3.13,
+- Node.js 24 LTS a npm 11,
+- Docker Desktop s Docker Compose,
+- Terraform bude potřeba až v M4 a zatím není lokální podmínkou,
+- Ruff, mypy a pytest se instalují přes Python dev dependencies.
+
+Python 3.13 je [podporovaná stabilní řada](https://devguide.python.org/versions/) do října 2029. Node.js 24 je [LTS řada](https://nodejs.org/en/about/previous-releases) podporovaná do dubna 2028. Patch verze lze průběžně aktualizovat bez změny architektury.
+
+## První lokální nastavení
+
+V PowerShellu:
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+python -m pip install -e ".[dev]"
+```
+
+Na Linuxu/macOS se aktivace liší:
+
+```bash
+source .venv/bin/activate
+```
+
+Frontend zatím nemá `package.json`; vznikne až v tasku `M3-01`, aby nebyl předčasně zvolen frameworkový scaffold bez stabilního API kontraktu.
+
+## Kontroly kvality
+
+```powershell
+python -m ruff check backend scripts
+python -m ruff format --check backend scripts
+python -m mypy
+python -m pytest
+```
+
+Automatická oprava formátu:
+
+```powershell
+python -m ruff check --fix backend scripts
+python -m ruff format backend scripts
+```
+
+Pokud dev dependencies ještě nejsou nainstalované, lze základ syntaxe ověřit příkazem:
+
+```powershell
+python -m compileall backend/src backend/tests
+```
+
+## Pravidla práce
+
+- Nezačínat task bez kontroly `specifikace.md`, `roadmap.md` a `progres.md`.
+- Stav tasku aktualizovat v `progres.md` ve stejné sadě změn.
+- Tajné údaje patří pouze do lokálního `.env` nebo později do Secret Manageru.
+- Nový kód nesmí používat absolutní uživatelské cesty ani SQLite/CSV jako autoritativní úložiště.
+- Živé integrační testy musí být explicitní a šetrné; nesmějí běžet v běžné unit test sadě.
+- Produkční GCP změny se nedělají před uzavřením validační brány M0.
+
+Detailnější pokyny pro přispívání jsou v [CONTRIBUTING.md](CONTRIBUTING.md).

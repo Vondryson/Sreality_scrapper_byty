@@ -1,0 +1,1765 @@
+{
+  "fixture_meta": {
+    "schema_version": 1,
+    "captured_on": "2026-08-02",
+    "category": "chalupa",
+    "fixture_type": "detail",
+    "source_contract": "Next.js __NEXT_DATA__ SSR",
+    "sanitized": true,
+    "contains_original_listing_content": false
+  },
+  "query_name": "estate",
+  "data": {
+    "categoryMainCb": {
+      "name": "<anonymized>",
+      "value": 2
+    },
+    "categorySubCb": {
+      "name": "<anonymized>",
+      "value": 43
+    },
+    "categoryTypeCb": {
+      "name": "<anonymized>",
+      "value": 1
+    },
+    "description": "<anonymized>",
+    "images": [
+      {
+        "alt": "<anonymized>",
+        "kind": 2,
+        "order": 1,
+        "url": "https://example.invalid/fixture",
+        "width": 1600,
+        "height": 1066,
+        "id": 1000000001
+      },
+      {
+        "alt": "<anonymized>",
+        "kind": 2,
+        "order": 4,
+        "url": "https://example.invalid/fixture",
+        "width": 1600,
+        "height": 1066,
+        "id": 1000000001
+      }
+    ],
+    "matterportUrl": "https://example.invalid/fixture",
+    "panorama": false,
+    "panoramaData": null,
+    "name": "<anonymized>",
+    "note": null,
+    "locality": {
+      "latitude": 50.0,
+      "longitude": 14.0,
+      "city": "<anonymized>",
+      "citySeoName": "<anonymized>",
+      "cityPart": "<anonymized>",
+      "cityPartSeoName": "<anonymized>",
+      "country": "<anonymized>",
+      "countryId": 1000000001,
+      "district": "<anonymized>",
+      "districtId": 1000000001,
+      "districtSeoName": "<anonymized>",
+      "entityType": "<anonymized>",
+      "houseNumber": "<anonymized>",
+      "geometry": {
+        "geometry": [],
+        "boundingBox": null,
+        "geometryType": null
+      },
+      "inaccuracyType": "<anonymized>",
+      "municipality": null,
+      "municipalityId": 1000000001,
+      "municipalitySeoName": null,
+      "quarter": null,
+      "quarterId": null,
+      "region": "<anonymized>",
+      "regionId": 1000000001,
+      "regionSeoName": "<anonymized>",
+      "street": "<anonymized>",
+      "streetId": null,
+      "streetNumber": "<anonymized>",
+      "streetSeoName": null,
+      "ward": null,
+      "wardId": 1000000001,
+      "wardSeoName": null,
+      "zip": 28401
+    },
+    "price": 1234567,
+    "priceSummaryCzk": 1234567,
+    "priceSummaryOldCzk": null,
+    "priceSummaryUnitCb": {
+      "name": "<anonymized>",
+      "value": 1
+    },
+    "priceCzk": 1234567,
+    "priceCzkPerSqM": 1234567,
+    "priceCurrencyCb": {
+      "name": "<anonymized>",
+      "value": 1
+    },
+    "priceUnitCb": {
+      "name": "<anonymized>",
+      "value": 1
+    },
+    "premise": {
+      "retargetingId": null,
+      "askId": 1000000001,
+      "premisePaidFirmy": true,
+      "companySubjectId": 1000000001,
+      "ico": 24193844,
+      "id": 1000000001,
+      "isSosCustomAdvertCard": false,
+      "logo": "<anonymized>",
+      "name": "<anonymized>",
+      "seoName": "<anonymized>",
+      "reviewCount": 140,
+      "reviewScore": 4.9,
+      "webUrl": "https://example.invalid/fixture",
+      "webVisibleUrl": "https://example.invalid/fixture",
+      "locality": {
+        "latitude": 50.0,
+        "longitude": 14.0,
+        "city": "<anonymized>",
+        "citySeoName": "<anonymized>",
+        "cityPart": null,
+        "country": null,
+        "district": "<anonymized>",
+        "districtId": 1000000001,
+        "entityId": 1000000001,
+        "entityType": "<anonymized>",
+        "houseNumber": "<anonymized>",
+        "municipality": null,
+        "municipalityId": 1000000001,
+        "quarter": "<anonymized>",
+        "quarterId": 1000000001,
+        "quarterSeoName": "<anonymized>",
+        "region": "<anonymized>",
+        "regionId": 1000000001,
+        "street": "<anonymized>",
+        "streetId": 1000000001,
+        "streetNumber": "<anonymized>",
+        "ward": "<anonymized>",
+        "wardId": 1000000001,
+        "wardSeoName": "<anonymized>",
+        "zip": 11000
+      }
+    },
+    "seller": {
+      "rating": null,
+      "reviewCount": null,
+      "image": "<anonymized>",
+      "email": "<anonymized>",
+      "id": 1000000001,
+      "name": "<anonymized>",
+      "phones": [
+        {
+          "phoneType": "<anonymized>",
+          "phone": "<anonymized>"
+        }
+      ]
+    },
+    "rus": null,
+    "nearest": [
+      {
+        "description": "<anonymized>",
+        "distance": 2829,
+        "imgUrl": "https://example.invalid/fixture",
+        "lat": 50.0,
+        "lon": 14.0,
+        "name": "<anonymized>",
+        "source": "<anonymized>",
+        "sourceId": 1000000001,
+        "url": "https://example.invalid/fixture",
+        "lines": [],
+        "photoUrl": "https://example.invalid/fixture",
+        "rating": 4,
+        "reviewCount": 2
+      },
+      {
+        "description": "<anonymized>",
+        "distance": 921,
+        "imgUrl": "https://example.invalid/fixture",
+        "lat": 50.0,
+        "lon": 14.0,
+        "name": "<anonymized>",
+        "source": "<anonymized>",
+        "sourceId": 1000000001,
+        "url": "https://example.invalid/fixture",
+        "lines": [],
+        "photoUrl": "https://example.invalid/fixture",
+        "rating": 5,
+        "reviewCount": 14
+      }
+    ],
+    "videos": [
+      {
+        "description": "<anonymized>",
+        "image": null,
+        "sdnSplUrl": "https://example.invalid/fixture"
+      }
+    ],
+    "extendedPois": {
+      "transport": {
+        "url": "https://example.invalid/fixture",
+        "values": [
+          {
+            "description": "<anonymized>",
+            "distance": 244,
+            "imgUrl": "https://example.invalid/fixture",
+            "lat": 50.0,
+            "lon": 14.0,
+            "name": "<anonymized>",
+            "source": "<anonymized>",
+            "sourceId": 1000000001,
+            "url": "https://example.invalid/fixture",
+            "lines": [
+              {
+                "departureDirection": -1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              }
+            ],
+            "photoUrl": "https://example.invalid/fixture",
+            "rating": -1,
+            "reviewCount": 0
+          },
+          {
+            "description": "<anonymized>",
+            "distance": 254,
+            "imgUrl": "https://example.invalid/fixture",
+            "lat": 50.0,
+            "lon": 14.0,
+            "name": "<anonymized>",
+            "source": "<anonymized>",
+            "sourceId": 1000000001,
+            "url": "https://example.invalid/fixture",
+            "lines": [
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              }
+            ],
+            "photoUrl": "https://example.invalid/fixture",
+            "rating": -1,
+            "reviewCount": 0
+          },
+          {
+            "description": "<anonymized>",
+            "distance": 868,
+            "imgUrl": "https://example.invalid/fixture",
+            "lat": 50.0,
+            "lon": 14.0,
+            "name": "<anonymized>",
+            "source": "<anonymized>",
+            "sourceId": 1000000001,
+            "url": "https://example.invalid/fixture",
+            "lines": [
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              }
+            ],
+            "photoUrl": "https://example.invalid/fixture",
+            "rating": -1,
+            "reviewCount": 0
+          },
+          {
+            "description": "<anonymized>",
+            "distance": 876,
+            "imgUrl": "https://example.invalid/fixture",
+            "lat": 50.0,
+            "lon": 14.0,
+            "name": "<anonymized>",
+            "source": "<anonymized>",
+            "sourceId": 1000000001,
+            "url": "https://example.invalid/fixture",
+            "lines": [
+              {
+                "departureDirection": -1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              }
+            ],
+            "photoUrl": "https://example.invalid/fixture",
+            "rating": -1,
+            "reviewCount": 0
+          },
+          {
+            "description": "<anonymized>",
+            "distance": 1151,
+            "imgUrl": "https://example.invalid/fixture",
+            "lat": 50.0,
+            "lon": 14.0,
+            "name": "<anonymized>",
+            "source": "<anonymized>",
+            "sourceId": 1000000001,
+            "url": "https://example.invalid/fixture",
+            "lines": [
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              }
+            ],
+            "photoUrl": "https://example.invalid/fixture",
+            "rating": -1,
+            "reviewCount": 0
+          },
+          {
+            "description": "<anonymized>",
+            "distance": 4419,
+            "imgUrl": "https://example.invalid/fixture",
+            "lat": 50.0,
+            "lon": 14.0,
+            "name": "<anonymized>",
+            "source": "<anonymized>",
+            "sourceId": 1000000001,
+            "url": "https://example.invalid/fixture",
+            "lines": [
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              },
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              },
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              },
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              },
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              },
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              },
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              },
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              },
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              },
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              },
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              },
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              },
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              },
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              },
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              },
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              },
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              },
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              },
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              },
+              {
+                "departureDirection": -1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              }
+            ],
+            "photoUrl": "https://example.invalid/fixture",
+            "rating": -1,
+            "reviewCount": 0
+          },
+          {
+            "description": "<anonymized>",
+            "distance": 4431,
+            "imgUrl": "https://example.invalid/fixture",
+            "lat": 50.0,
+            "lon": 14.0,
+            "name": "<anonymized>",
+            "source": "<anonymized>",
+            "sourceId": 1000000001,
+            "url": "https://example.invalid/fixture",
+            "lines": [
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              },
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              },
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              },
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              },
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              },
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              },
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              },
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              },
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              },
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              },
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              },
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              },
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              },
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              },
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              },
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              },
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              },
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              },
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              },
+              {
+                "departureDirection": -1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              }
+            ],
+            "photoUrl": "https://example.invalid/fixture",
+            "rating": -1,
+            "reviewCount": 0
+          },
+          {
+            "description": "<anonymized>",
+            "distance": 4642,
+            "imgUrl": "https://example.invalid/fixture",
+            "lat": 50.0,
+            "lon": 14.0,
+            "name": "<anonymized>",
+            "source": "<anonymized>",
+            "sourceId": 1000000001,
+            "url": "https://example.invalid/fixture",
+            "lines": [
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              },
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              },
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              },
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              },
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              },
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              },
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              },
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              },
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              },
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              },
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              },
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              },
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              },
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              },
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              },
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              },
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              },
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              },
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              },
+              {
+                "departureDirection": -1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              }
+            ],
+            "photoUrl": "https://example.invalid/fixture",
+            "rating": -1,
+            "reviewCount": 0
+          },
+          {
+            "description": "<anonymized>",
+            "distance": 4760,
+            "imgUrl": "https://example.invalid/fixture",
+            "lat": 50.0,
+            "lon": 14.0,
+            "name": "<anonymized>",
+            "source": "<anonymized>",
+            "sourceId": 1000000001,
+            "url": "https://example.invalid/fixture",
+            "lines": [
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              },
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              },
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              },
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              },
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              },
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              },
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              },
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              },
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              },
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              },
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              },
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              },
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              },
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              },
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              },
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              },
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              },
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              },
+              {
+                "departureDirection": 1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              },
+              {
+                "departureDirection": -1,
+                "lineId": "<anonymized>",
+                "lineLabel": "<anonymized>",
+                "poiId": 1000000001,
+                "terminus": "<anonymized>",
+                "type": "<anonymized>"
+              }
+            ],
+            "photoUrl": "https://example.invalid/fixture",
+            "rating": -1,
+            "reviewCount": 0
+          }
+        ]
+      },
+      "doctors": {
+        "url": "https://example.invalid/fixture",
+        "values": [
+          {
+            "description": "<anonymized>",
+            "distance": 3762,
+            "imgUrl": "https://example.invalid/fixture",
+            "lat": 50.0,
+            "lon": 14.0,
+            "name": "<anonymized>",
+            "source": "<anonymized>",
+            "sourceId": 1000000001,
+            "url": "https://example.invalid/fixture",
+            "lines": [],
+            "photoUrl": "https://example.invalid/fixture",
+            "rating": 5,
+            "reviewCount": 2
+          },
+          {
+            "description": "<anonymized>",
+            "distance": 4094,
+            "imgUrl": "https://example.invalid/fixture",
+            "lat": 50.0,
+            "lon": 14.0,
+            "name": "<anonymized>",
+            "source": "<anonymized>",
+            "sourceId": 1000000001,
+            "url": "https://example.invalid/fixture",
+            "lines": [],
+            "photoUrl": "https://example.invalid/fixture",
+            "rating": 5,
+            "reviewCount": 16
+          },
+          {
+            "description": "<anonymized>",
+            "distance": 4094,
+            "imgUrl": "https://example.invalid/fixture",
+            "lat": 50.0,
+            "lon": 14.0,
+            "name": "<anonymized>",
+            "source": "<anonymized>",
+            "sourceId": 1000000001,
+            "url": "https://example.invalid/fixture",
+            "lines": [],
+            "photoUrl": "https://example.invalid/fixture",
+            "rating": -1,
+            "reviewCount": 0
+          }
+        ]
+      },
+      "grocery": {
+        "url": "https://example.invalid/fixture",
+        "values": [
+          {
+            "description": "<anonymized>",
+            "distance": 2829,
+            "imgUrl": "https://example.invalid/fixture",
+            "lat": 50.0,
+            "lon": 14.0,
+            "name": "<anonymized>",
+            "source": "<anonymized>",
+            "sourceId": 1000000001,
+            "url": "https://example.invalid/fixture",
+            "lines": [],
+            "photoUrl": "https://example.invalid/fixture",
+            "rating": 4,
+            "reviewCount": 2
+          },
+          {
+            "description": "<anonymized>",
+            "distance": 4036,
+            "imgUrl": "https://example.invalid/fixture",
+            "lat": 50.0,
+            "lon": 14.0,
+            "name": "<anonymized>",
+            "source": "<anonymized>",
+            "sourceId": 1000000001,
+            "url": "https://example.invalid/fixture",
+            "lines": [],
+            "photoUrl": "https://example.invalid/fixture",
+            "rating": 5,
+            "reviewCount": 1
+          },
+          {
+            "description": "<anonymized>",
+            "distance": 4054,
+            "imgUrl": "https://example.invalid/fixture",
+            "lat": 50.0,
+            "lon": 14.0,
+            "name": "<anonymized>",
+            "source": "<anonymized>",
+            "sourceId": 1000000001,
+            "url": "https://example.invalid/fixture",
+            "lines": [],
+            "photoUrl": "https://example.invalid/fixture",
+            "rating": -1,
+            "reviewCount": 0
+          },
+          {
+            "description": "<anonymized>",
+            "distance": 4058,
+            "imgUrl": "https://example.invalid/fixture",
+            "lat": 50.0,
+            "lon": 14.0,
+            "name": "<anonymized>",
+            "source": "<anonymized>",
+            "sourceId": 1000000001,
+            "url": "https://example.invalid/fixture",
+            "lines": [],
+            "photoUrl": "https://example.invalid/fixture",
+            "rating": 5,
+            "reviewCount": 1
+          },
+          {
+            "description": "<anonymized>",
+            "distance": 4104,
+            "imgUrl": "https://example.invalid/fixture",
+            "lat": 50.0,
+            "lon": 14.0,
+            "name": "<anonymized>",
+            "source": "<anonymized>",
+            "sourceId": 1000000001,
+            "url": "https://example.invalid/fixture",
+            "lines": [],
+            "photoUrl": "https://example.invalid/fixture",
+            "rating": -1,
+            "reviewCount": 0
+          }
+        ]
+      },
+      "leisure": {
+        "url": "https://example.invalid/fixture",
+        "values": [
+          {
+            "description": "<anonymized>",
+            "distance": 987,
+            "imgUrl": "https://example.invalid/fixture",
+            "lat": 50.0,
+            "lon": 14.0,
+            "name": "<anonymized>",
+            "source": "<anonymized>",
+            "sourceId": 1000000001,
+            "url": "https://example.invalid/fixture",
+            "lines": [],
+            "photoUrl": "https://example.invalid/fixture",
+            "rating": -1,
+            "reviewCount": 0
+          },
+          {
+            "description": "<anonymized>",
+            "distance": 1036,
+            "imgUrl": "https://example.invalid/fixture",
+            "lat": 50.0,
+            "lon": 14.0,
+            "name": "<anonymized>",
+            "source": "<anonymized>",
+            "sourceId": 1000000001,
+            "url": "https://example.invalid/fixture",
+            "lines": [],
+            "photoUrl": "https://example.invalid/fixture",
+            "rating": -1,
+            "reviewCount": 0
+          },
+          {
+            "description": "<anonymized>",
+            "distance": 1350,
+            "imgUrl": "https://example.invalid/fixture",
+            "lat": 50.0,
+            "lon": 14.0,
+            "name": "<anonymized>",
+            "source": "<anonymized>",
+            "sourceId": 1000000001,
+            "url": "https://example.invalid/fixture",
+            "lines": [],
+            "photoUrl": "https://example.invalid/fixture",
+            "rating": -1,
+            "reviewCount": 0
+          },
+          {
+            "description": "<anonymized>",
+            "distance": 1394,
+            "imgUrl": "https://example.invalid/fixture",
+            "lat": 50.0,
+            "lon": 14.0,
+            "name": "<anonymized>",
+            "source": "<anonymized>",
+            "sourceId": 1000000001,
+            "url": "https://example.invalid/fixture",
+            "lines": [],
+            "photoUrl": "https://example.invalid/fixture",
+            "rating": -1,
+            "reviewCount": 0
+          },
+          {
+            "description": "<anonymized>",
+            "distance": 2398,
+            "imgUrl": "https://example.invalid/fixture",
+            "lat": 50.0,
+            "lon": 14.0,
+            "name": "<anonymized>",
+            "source": "<anonymized>",
+            "sourceId": 1000000001,
+            "url": "https://example.invalid/fixture",
+            "lines": [],
+            "photoUrl": "https://example.invalid/fixture",
+            "rating": 2,
+            "reviewCount": 3
+          },
+          {
+            "description": "<anonymized>",
+            "distance": 3049,
+            "imgUrl": "https://example.invalid/fixture",
+            "lat": 50.0,
+            "lon": 14.0,
+            "name": "<anonymized>",
+            "source": "<anonymized>",
+            "sourceId": 1000000001,
+            "url": "https://example.invalid/fixture",
+            "lines": [],
+            "photoUrl": "https://example.invalid/fixture",
+            "rating": -1,
+            "reviewCount": 0
+          },
+          {
+            "description": "<anonymized>",
+            "distance": 3908,
+            "imgUrl": "https://example.invalid/fixture",
+            "lat": 50.0,
+            "lon": 14.0,
+            "name": "<anonymized>",
+            "source": "<anonymized>",
+            "sourceId": 1000000001,
+            "url": "https://example.invalid/fixture",
+            "lines": [],
+            "photoUrl": "https://example.invalid/fixture",
+            "rating": -1,
+            "reviewCount": 0
+          },
+          {
+            "description": "<anonymized>",
+            "distance": 4065,
+            "imgUrl": "https://example.invalid/fixture",
+            "lat": 50.0,
+            "lon": 14.0,
+            "name": "<anonymized>",
+            "source": "<anonymized>",
+            "sourceId": 1000000001,
+            "url": "https://example.invalid/fixture",
+            "lines": [],
+            "photoUrl": "https://example.invalid/fixture",
+            "rating": -1,
+            "reviewCount": 0
+          },
+          {
+            "description": "<anonymized>",
+            "distance": 4141,
+            "imgUrl": "https://example.invalid/fixture",
+            "lat": 50.0,
+            "lon": 14.0,
+            "name": "<anonymized>",
+            "source": "<anonymized>",
+            "sourceId": 1000000001,
+            "url": "https://example.invalid/fixture",
+            "lines": [],
+            "photoUrl": "https://example.invalid/fixture",
+            "rating": -1,
+            "reviewCount": 0
+          },
+          {
+            "description": "<anonymized>",
+            "distance": 4566,
+            "imgUrl": "https://example.invalid/fixture",
+            "lat": 50.0,
+            "lon": 14.0,
+            "name": "<anonymized>",
+            "source": "<anonymized>",
+            "sourceId": 1000000001,
+            "url": "https://example.invalid/fixture",
+            "lines": [],
+            "photoUrl": "https://example.invalid/fixture",
+            "rating": 5,
+            "reviewCount": 1
+          }
+        ]
+      },
+      "restaurants": {
+        "url": "https://example.invalid/fixture",
+        "values": [
+          {
+            "description": "<anonymized>",
+            "distance": 921,
+            "imgUrl": "https://example.invalid/fixture",
+            "lat": 50.0,
+            "lon": 14.0,
+            "name": "<anonymized>",
+            "source": "<anonymized>",
+            "sourceId": 1000000001,
+            "url": "https://example.invalid/fixture",
+            "lines": [],
+            "photoUrl": "https://example.invalid/fixture",
+            "rating": 5,
+            "reviewCount": 14
+          },
+          {
+            "description": "<anonymized>",
+            "distance": 3790,
+            "imgUrl": "https://example.invalid/fixture",
+            "lat": 50.0,
+            "lon": 14.0,
+            "name": "<anonymized>",
+            "source": "<anonymized>",
+            "sourceId": 1000000001,
+            "url": "https://example.invalid/fixture",
+            "lines": [],
+            "photoUrl": "https://example.invalid/fixture",
+            "rating": 4,
+            "reviewCount": 72
+          },
+          {
+            "description": "<anonymized>",
+            "distance": 3928,
+            "imgUrl": "https://example.invalid/fixture",
+            "lat": 50.0,
+            "lon": 14.0,
+            "name": "<anonymized>",
+            "source": "<anonymized>",
+            "sourceId": 1000000001,
+            "url": "https://example.invalid/fixture",
+            "lines": [],
+            "photoUrl": "https://example.invalid/fixture",
+            "rating": 4,
+            "reviewCount": 17
+          },
+          {
+            "description": "<anonymized>",
+            "distance": 3928,
+            "imgUrl": "https://example.invalid/fixture",
+            "lat": 50.0,
+            "lon": 14.0,
+            "name": "<anonymized>",
+            "source": "<anonymized>",
+            "sourceId": 1000000001,
+            "url": "https://example.invalid/fixture",
+            "lines": [],
+            "photoUrl": "https://example.invalid/fixture",
+            "rating": 5,
+            "reviewCount": 1
+          },
+          {
+            "description": "<anonymized>",
+            "distance": 3990,
+            "imgUrl": "https://example.invalid/fixture",
+            "lat": 50.0,
+            "lon": 14.0,
+            "name": "<anonymized>",
+            "source": "<anonymized>",
+            "sourceId": 1000000001,
+            "url": "https://example.invalid/fixture",
+            "lines": [],
+            "photoUrl": "https://example.invalid/fixture",
+            "rating": 4,
+            "reviewCount": 19
+          },
+          {
+            "description": "<anonymized>",
+            "distance": 4056,
+            "imgUrl": "https://example.invalid/fixture",
+            "lat": 50.0,
+            "lon": 14.0,
+            "name": "<anonymized>",
+            "source": "<anonymized>",
+            "sourceId": 1000000001,
+            "url": "https://example.invalid/fixture",
+            "lines": [],
+            "photoUrl": "https://example.invalid/fixture",
+            "rating": 4,
+            "reviewCount": 2
+          },
+          {
+            "description": "<anonymized>",
+            "distance": 4144,
+            "imgUrl": "https://example.invalid/fixture",
+            "lat": 50.0,
+            "lon": 14.0,
+            "name": "<anonymized>",
+            "source": "<anonymized>",
+            "sourceId": 1000000001,
+            "url": "https://example.invalid/fixture",
+            "lines": [],
+            "photoUrl": "https://example.invalid/fixture",
+            "rating": 4,
+            "reviewCount": 6
+          },
+          {
+            "description": "<anonymized>",
+            "distance": 4961,
+            "imgUrl": "https://example.invalid/fixture",
+            "lat": 50.0,
+            "lon": 14.0,
+            "name": "<anonymized>",
+            "source": "<anonymized>",
+            "sourceId": 1000000001,
+            "url": "https://example.invalid/fixture",
+            "lines": [],
+            "photoUrl": "https://example.invalid/fixture",
+            "rating": -1,
+            "reviewCount": 0
+          },
+          {
+            "description": "<anonymized>",
+            "distance": 5069,
+            "imgUrl": "https://example.invalid/fixture",
+            "lat": 50.0,
+            "lon": 14.0,
+            "name": "<anonymized>",
+            "source": "<anonymized>",
+            "sourceId": 1000000001,
+            "url": "https://example.invalid/fixture",
+            "lines": [],
+            "photoUrl": "https://example.invalid/fixture",
+            "rating": 5,
+            "reviewCount": 14
+          }
+        ]
+      },
+      "schools": {
+        "url": "https://example.invalid/fixture",
+        "values": [
+          {
+            "description": "<anonymized>",
+            "distance": 1330,
+            "imgUrl": "https://example.invalid/fixture",
+            "lat": 50.0,
+            "lon": 14.0,
+            "name": "<anonymized>",
+            "source": "<anonymized>",
+            "sourceId": 1000000001,
+            "url": "https://example.invalid/fixture",
+            "lines": [],
+            "photoUrl": "https://example.invalid/fixture",
+            "rating": 5,
+            "reviewCount": 3
+          },
+          {
+            "description": "<anonymized>",
+            "distance": 2953,
+            "imgUrl": "https://example.invalid/fixture",
+            "lat": 50.0,
+            "lon": 14.0,
+            "name": "<anonymized>",
+            "source": "<anonymized>",
+            "sourceId": 1000000001,
+            "url": "https://example.invalid/fixture",
+            "lines": [],
+            "photoUrl": "https://example.invalid/fixture",
+            "rating": 4,
+            "reviewCount": 6
+          },
+          {
+            "description": "<anonymized>",
+            "distance": 3272,
+            "imgUrl": "https://example.invalid/fixture",
+            "lat": 50.0,
+            "lon": 14.0,
+            "name": "<anonymized>",
+            "source": "<anonymized>",
+            "sourceId": 1000000001,
+            "url": "https://example.invalid/fixture",
+            "lines": [],
+            "photoUrl": "https://example.invalid/fixture",
+            "rating": -1,
+            "reviewCount": 0
+          },
+          {
+            "description": "<anonymized>",
+            "distance": 3586,
+            "imgUrl": "https://example.invalid/fixture",
+            "lat": 50.0,
+            "lon": 14.0,
+            "name": "<anonymized>",
+            "source": "<anonymized>",
+            "sourceId": 1000000001,
+            "url": "https://example.invalid/fixture",
+            "lines": [],
+            "photoUrl": "https://example.invalid/fixture",
+            "rating": -1,
+            "reviewCount": 0
+          },
+          {
+            "description": "<anonymized>",
+            "distance": 3794,
+            "imgUrl": "https://example.invalid/fixture",
+            "lat": 50.0,
+            "lon": 14.0,
+            "name": "<anonymized>",
+            "source": "<anonymized>",
+            "sourceId": 1000000001,
+            "url": "https://example.invalid/fixture",
+            "lines": [],
+            "photoUrl": "https://example.invalid/fixture",
+            "rating": 4,
+            "reviewCount": 6
+          },
+          {
+            "description": "<anonymized>",
+            "distance": 3851,
+            "imgUrl": "https://example.invalid/fixture",
+            "lat": 50.0,
+            "lon": 14.0,
+            "name": "<anonymized>",
+            "source": "<anonymized>",
+            "sourceId": 1000000001,
+            "url": "https://example.invalid/fixture",
+            "lines": [],
+            "photoUrl": "https://example.invalid/fixture",
+            "rating": -1,
+            "reviewCount": 0
+          },
+          {
+            "description": "<anonymized>",
+            "distance": 3995,
+            "imgUrl": "https://example.invalid/fixture",
+            "lat": 50.0,
+            "lon": 14.0,
+            "name": "<anonymized>",
+            "source": "<anonymized>",
+            "sourceId": 1000000001,
+            "url": "https://example.invalid/fixture",
+            "lines": [],
+            "photoUrl": "https://example.invalid/fixture",
+            "rating": 5,
+            "reviewCount": 2
+          },
+          {
+            "description": "<anonymized>",
+            "distance": 4161,
+            "imgUrl": "https://example.invalid/fixture",
+            "lat": 50.0,
+            "lon": 14.0,
+            "name": "<anonymized>",
+            "source": "<anonymized>",
+            "sourceId": 1000000001,
+            "url": "https://example.invalid/fixture",
+            "lines": [],
+            "photoUrl": "https://example.invalid/fixture",
+            "rating": 5,
+            "reviewCount": 1
+          },
+          {
+            "description": "<anonymized>",
+            "distance": 4335,
+            "imgUrl": "https://example.invalid/fixture",
+            "lat": 50.0,
+            "lon": 14.0,
+            "name": "<anonymized>",
+            "source": "<anonymized>",
+            "sourceId": 1000000001,
+            "url": "https://example.invalid/fixture",
+            "lines": [],
+            "photoUrl": "https://example.invalid/fixture",
+            "rating": 5,
+            "reviewCount": 1
+          },
+          {
+            "description": "<anonymized>",
+            "distance": 5148,
+            "imgUrl": "https://example.invalid/fixture",
+            "lat": 50.0,
+            "lon": 14.0,
+            "name": "<anonymized>",
+            "source": "<anonymized>",
+            "sourceId": 1000000001,
+            "url": "https://example.invalid/fixture",
+            "lines": [],
+            "photoUrl": "https://example.invalid/fixture",
+            "rating": 5,
+            "reviewCount": 1
+          }
+        ]
+      }
+    },
+    "isExclusively": true,
+    "estateArea": 100,
+    "roomCountCb": {
+      "name": "<anonymized>",
+      "value": 3
+    },
+    "objectType": {
+      "name": "<anonymized>",
+      "value": 1
+    },
+    "rusReply": null,
+    "params": {
+      "advertCode": "<anonymized>",
+      "annuity": null,
+      "costOfLiving": "<anonymized>",
+      "project": null,
+      "acceptanceYear": 1945,
+      "basin": false,
+      "basinArea": null,
+      "beginningDate": null,
+      "buildingArea": null,
+      "buildingCondition": {
+        "name": "<anonymized>",
+        "value": 1
+      },
+      "buildingType": {
+        "name": "<anonymized>",
+        "value": 2
+      },
+      "cellar": false,
+      "cellarArea": null,
+      "circuitBreakerCb": null,
+      "easyAccess": {
+        "name": "<anonymized>",
+        "value": 0
+      },
+      "edited": "<anonymized>",
+      "electricitySet": [
+        {
+          "name": "<anonymized>",
+          "value": 2
+        }
+      ],
+      "elevator": {
+        "name": "<anonymized>",
+        "value": 0
+      },
+      "energyEfficiencyRating": {
+        "name": "<anonymized>",
+        "value": 7
+      },
+      "energyPerformanceCertificate": {
+        "name": "<anonymized>",
+        "value": 3
+      },
+      "energyPerformanceSummary": null,
+      "estateArea": 100,
+      "finishDate": null,
+      "firstTourDate": null,
+      "firstTourDateTo": null,
+      "floorArea": null,
+      "floors": 1,
+      "ftvPanels": false,
+      "furnished": {
+        "name": "<anonymized>",
+        "value": 3
+      },
+      "garage": true,
+      "garageCount": 1,
+      "gardenArea": null,
+      "garret": false,
+      "gasSet": [
+        {
+          "name": "<anonymized>",
+          "value": 2
+        }
+      ],
+      "gullySet": [
+        {
+          "name": "<anonymized>",
+          "value": 1
+        }
+      ],
+      "heatingElementSet": [],
+      "heatingSet": [],
+      "heatingSourceSet": [],
+      "internetConnectionProvider": null,
+      "internetConnectionSpeed": null,
+      "internetConnectionTypeSet": [],
+      "keywords": [
+        "<anonymized>"
+      ],
+      "lowEnergy": false,
+      "objectAge": null,
+      "objectKind": {
+        "name": "<anonymized>",
+        "value": 4
+      },
+      "objectLocation": {
+        "name": "<anonymized>",
+        "value": 6
+      },
+      "objectType": {
+        "name": "<anonymized>",
+        "value": 1
+      },
+      "parking": 2,
+      "parkingLots": true,
+      "phaseDistributionsCb": null,
+      "protection": {
+        "name": "<anonymized>",
+        "value": 0
+      },
+      "readyDate": null,
+      "reconstructionYear": null,
+      "roadTypeSet": [],
+      "roomCountCb": {
+        "name": "<anonymized>",
+        "value": 3
+      },
+      "sdnEnergyPerformanceAttachmentUrl": "https://example.invalid/fixture",
+      "since": "<anonymized>",
+      "solarPanels": false,
+      "stateCb": {
+        "name": "<anonymized>",
+        "value": 0
+      },
+      "stats": 2375,
+      "surroundingsType": {
+        "name": "<anonymized>",
+        "value": 0
+      },
+      "telecommunicationSet": [],
+      "transportSet": [],
+      "undergroundFloors": null,
+      "usableArea": 100,
+      "waterHeatSourceSet": [],
+      "waterSet": [
+        {
+          "name": "<anonymized>",
+          "value": 2
+        },
+        {
+          "name": "<anonymized>",
+          "value": 4
+        }
+      ],
+      "wellTypeSet": [],
+      "priceFlagNegotiationCb": false,
+      "priceNote": "<anonymized>"
+    }
+  }
+}

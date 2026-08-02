@@ -7,6 +7,7 @@ __pycache__/
 .ruff_cache/
 .ipynb_checkpoints/
 .idea/
+.vscode/
 # Web drivers - necessary for Selenium version of scraping
 *.exe
 # Env variables such as path
@@ -14,6 +15,42 @@ __pycache__/
 # venv = virtual environment
 .venv/
 venv/
+# Python build and quality outputs
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+dist/
+build/
+*.egg-info/
+
+# Node / Next.js
+node_modules/
+.next/
+out/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+crash.log
+crash.*.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+*.tfvars
+*.tfvars.json
+!.tfvars.example
+
+# Local containers and application data
+.docker-data/
+/data/
 # My personal notes and TODOs
 notes.md
 *.png
