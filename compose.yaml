@@ -1,0 +1,24 @@
+name: sreality-tracker
+
+services:
+  postgres:
+    image: postgres:16.10-alpine
+    environment:
+      POSTGRES_DB: sreality_tracker
+      POSTGRES_USER: sreality
+      POSTGRES_PASSWORD: sreality_local_only
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - sreality_postgres_data:/var/lib/postgresql/data
+      - ./infra/local/postgres/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 2s
+      timeout: 3s
+      retries: 15
+      start_period: 5s
+    restart: unless-stopped
+
+volumes:
+  sreality_postgres_data:

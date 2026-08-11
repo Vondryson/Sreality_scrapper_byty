@@ -2,12 +2,12 @@
 
 ## Aktuální stav
 
-- Poslední aktualizace: 2026-08-02
-- Aktuální milník: M0 – Ověření zdroje, návrhu a nákladů
-- Aktuální hlavní task: `M0-05` – blokováno potvrzením billing stavu cílového projektu
-- Následující doporučený task: `M1-01` – Navrhnout finální databázové schéma z profilu dat
+- Poslední aktualizace: 2026-08-11
+- Aktuální milník: M1 – PostgreSQL a spolehlivá datová pipeline (cloudová brána `M0-05` zůstává blokovaná)
+- Aktuální hlavní task: `M1-06` – Implementovat raw-storage rozhraní
+- Následující doporučený task: `M1-07` – Implementovat běh a ukládání pozorování
 - Blokátory: read-only ověření projektu/billingu/API selhává při obnově `gcloud` OAuth tokenu kvůli lokálnímu TLS certifikátu; je potřeba kontrola správným osobním účtem
-- Souhrn: 5 dokončeno, 0 rozpracováno, 1 blokováno, 37 čeká
+- Souhrn: 10 dokončeno, 1 rozpracováno, 1 blokováno, 31 čeká
 
 ## Legenda
 
@@ -32,12 +32,12 @@ Najednou má být `[~]` označen nejvýše jeden hlavní task. Dílčí paraleln
 
 ## M1 – PostgreSQL a spolehlivá datová pipeline
 
-- [ ] `M1-01` – Navrhnout finální databázové schéma z profilu dat.
-- [ ] `M1-02` – Přidat lokální PostgreSQL a migrační základ.
-- [ ] `M1-03` – Zavést validovanou konfiguraci a strukturované logování.
-- [ ] `M1-04` – Implementovat odolného Sreality HTTP klienta.
-- [ ] `M1-05` – Implementovat tolerantní parser a doménové modely.
-- [ ] `M1-06` – Implementovat raw-storage rozhraní.
+- [x] `M1-01` – Navrhnout finální databázové schéma z profilu dat.
+- [x] `M1-02` – Přidat lokální PostgreSQL a migrační základ.
+- [x] `M1-03` – Zavést validovanou konfiguraci a strukturované logování.
+- [x] `M1-04` – Implementovat odolného Sreality HTTP klienta.
+- [x] `M1-05` – Implementovat tolerantní parser a doménové modely.
+- [~] `M1-06` – Implementovat raw-storage rozhraní.
 - [ ] `M1-07` – Implementovat běh a ukládání pozorování.
 - [ ] `M1-08` – Implementovat události a stavový automat nabídek.
 - [ ] `M1-09` – Přidat bezpečnostní bránu deaktivace.
@@ -84,14 +84,14 @@ Najednou má být `[~]` označen nejvýše jeden hlavní task. Dílčí paraleln
 
 ## Pracovní poznámky k aktivnímu tasku
 
-### 2026-08-02 – `M0-05`
+### 2026-08-11 – `M1-06`
 
-- Ověřeny oficiální ceníky Cloud SQL, Cloud Run, Storage, Scheduler, Routes, Logging a Secret Manager; regionální dostupnost je pro navržené komponenty vyhovující.
-- Reprodukovatelný model vychází na 275,58 Kč bez daně v základním a 306,55 Kč v konzervativním scénáři. Cloud SQL tvoří přibližně 98 % základního odhadu.
-- Zdokumentováno kritické riziko Routes: bez cache by týdenní přepočet celého trhu přidal asi 662 Kč/měsíc. Navržena cache, bootstrap kvóta a následný limit 300/den.
-- Přidán report `docs/discovery/m0-05-gcp-costs.md`, kalkulační skript a unit testy.
-- Lokálně je Google Cloud SDK 549.0.0, ale Terraform chybí. Aktivní `gcloud` účet/projekt patří jinému pracovnímu prostředí a nebyl změněn.
-- Zbývá: správným osobním účtem potvrdit billing, daňový režim, aktivovatelnost API a finální Cloud SQL cenu v Calculatoru; potom zaznamenat uživatelovo cloud/local rozhodnutí.
+- Plán: zavést jednotné raw-storage rozhraní, deterministickou gzip serializaci a idempotentní lokální/GCS adaptéry adresované přes run/listing.
+- Rozsah: `sreality_tracker.storage`, unit testy lokálního adaptéru, mockované testy GCS a dokumentace object key/retence.
+- Rizika: opakovaný zápis stejného klíče s jiným obsahem nesmí tiše přepsat auditní payload; GCS testy nesmějí vyžadovat reálné credentials ani síť.
+- Předpoklady: kanonický object key obsahuje `run_id` a externí Sreality ID, payload je UTF-8 JSON komprimovaný gzip s deterministickým hashem.
+- Provedené testy: M1-05 prošel plnou sadou 43 passed, 1 live skipped; po reinstalaci Dockeru byl znovu ověřen PostgreSQL 16.10, Alembic head a bezpečný integrační migration round trip.
+- Zbývá: implementovat protokol a oba adaptéry, otestovat idempotenci, konflikt, kompresi a round trip.
 
 Při zahájení tasku sem zapsat:
 
@@ -122,6 +122,52 @@ Položka označená `[!]` musí zde uvést:
 - které další tasky blokuje.
 
 ## Historie dokončené práce
+
+### 2026-08-11 – `M1-05`
+
+- Přidány frameworkově nezávislé doménové modely search stránky, detailu, ceny, lokality a metadat obrázků.
+- Tolerantní parser načítá `__NEXT_DATA__`, vyhledá `estatesSearch`/`estate` query a zpracuje fixtures chat i chalup bez bytových předpokladů.
+- Chybějící volitelná pole se mapují na `None`/prázdnou kolekci; nulová cena zůstává zdrojově zachovaná, ale analyticky je `None` s příznakem.
+- Úplný detail, params, texty a raw metadata obrázků se zachovávají pro JSONB/raw storage; neznámá budoucí pole parser bezpečně ponechá.
+- `ListingKind` byl sjednocen pro klient, parser i SQLAlchemy modely bez změny databázového schématu.
+- Ověření: 9 parser testů, plná sada 43 passed a 1 explicitní live skipped; Ruff/mypy prošly a `alembic check` nehlásí drift.
+
+### 2026-08-11 – `M1-04`
+
+- Přidán sdílený synchronní `httpx.Client` pro celý běh s timeoutem, globálním pacingem, omezeným exponenciálním retry a jitterem.
+- Klient podporuje potvrzené search filtry chata 33/chalupa 43, bezpečné detail cesty a validuje status, host, Content-Type a SSR `__NEXT_DATA__` marker.
+- Redirecty mimo `www.sreality.cz` se nenásledují; veřejný tok používá zdrojem vracený `noredirect=1`, takže nevstupuje do autologin/CMP řetězce.
+- TLS validace zůstává zapnutá a používá systémový trust store, což řeší lokální firemní CA bez nebezpečného `verify=False`.
+- Přidány deterministické unit testy session, filtrů, pacingu, retry, validace a redirectů a explicitní dvourequestový live test.
+- Ověření: live chata/chalupa prošel; plná sada 34 passed, 1 live skipped ve výchozím režimu; nový kód prošel Ruff a strict mypy.
+
+### 2026-08-11 – `M1-03`
+
+- Přidána Pydantic Settings konfigurace načítaná výhradně z environment variables s prefixem `SREALITY_`.
+- Databázová URL je chráněná jako secret, validuje psycopg/PostgreSQL a chyby neobsahují vstupní hodnoty; lokální storage cesta nesmí být absolutní ani opustit workspace.
+- Legacy `.env.example` byl nahrazen bezpečným vzorem pro nový backend bez produkčních credentials a bez absolutních cest.
+- Přidán izolovaný JSON logger s kontextem `event`, `step`, `run_id`, `listing_id`, redakcí běžných credentials a bezpečným záznamem typu výjimky.
+- Dokumentace popisuje explicitní konfiguraci a strukturované logování.
+- Ověření: 26 testů včetně PostgreSQL integrace prošlo; nový kód prošel Ruff format/check a strict mypy; `git diff --check` bez chyb.
+
+### 2026-08-11 – `M1-02`
+
+- Přidán PostgreSQL 16.10 v Docker Compose se zdravotní kontrolou, perzistentním volume a oddělenou disposable testovací databází.
+- Přidány SQLAlchemy 2 modely všech sedmi entit a PostgreSQL enumy, omezení, cizí klíče a indexy podle návrhu M1-01.
+- Přidán Alembic základ a počáteční migrace `20260811_0001`; automaticky nalezená chyba downgrade byla opravena explicitním odstraněním enum typů.
+- Lokální dokumentace popisuje start, migraci, zastavení a bezpečné spuštění destruktivního integračního testu pouze nad `sreality_tracker_test`.
+- Ověření: reálný cyklus upgrade/downgrade/upgrade, `alembic check` bez driftu, PostgreSQL head `20260811_0001`, Compose config validní.
+- Testy: 19 passed včetně PostgreSQL integrace; nový M1-02 kód prošel Ruff format/check a strict mypy.
+- Opakované ověření po reinstalaci Dockeru odhalilo, že zděděná `SREALITY_DATABASE_URL` mohla přepsat explicitní testovací URL. Hlavní prázdné lokální schéma bylo obnoveno a Alembic nyní preferuje explicitní atribut, ověřuje očekávaný název databáze a regresní test prokázal, že konfliktní env hlavní schéma nezmění.
+
+### 2026-08-11 – `M1-01`
+
+- Přidán finální ER návrh sedmi povinných entit v `docs/architecture/m1-01-database-schema.md`.
+- Typy, nullable pravidla a mapování vycházejí z fixtures a profilů detailů z 2. a 11. srpna 2026.
+- Návrh odděluje externí Sreality ID od interních klíčů, normalizuje nulovou cenu na `NULL` s příznakem a zachovává proměnlivá pole v JSONB.
+- Popsány unikátní klíče pro běhy, pozorování, události, fotografie a cache vzdáleností, včetně indexů pro filtry, historii a týdenní medián.
+- Zakotven invariant, že hromadná deaktivace je možná pouze po úplném úspěšném načtení obou kategorií.
+- Ověření: automatická kontrola přítomnosti všech sedmi entit a klíčových invariantů prošla; `git diff --check` bez chyb.
 
 ### 2026-08-02 – `M0-04`
 

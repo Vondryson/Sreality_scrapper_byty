@@ -8,7 +8,14 @@ version = "0.1.0"
 description = "Private market tracker for cottages and chalets listed on Sreality.cz"
 readme = "README.md"
 requires-python = ">=3.13,<3.14"
-dependencies = []
+dependencies = [
+    "alembic>=1.16,<2",
+    "httpx>=0.28,<1",
+    "psycopg[binary]>=3.2,<4",
+    "pydantic-settings>=2.10,<3",
+    "sqlalchemy>=2.0,<3",
+    "truststore>=0.10,<1",
+]
 
 [project.optional-dependencies]
 dev = [
@@ -28,6 +35,10 @@ where = ["backend/src"]
 addopts = "-ra --strict-config --strict-markers"
 pythonpath = ["backend/src"]
 testpaths = ["backend/tests"]
+markers = [
+    "integration: requires an explicitly configured disposable PostgreSQL database",
+    "live: explicitly enabled low-frequency checks against external services",
+]
 
 [tool.ruff]
 target-version = "py313"
