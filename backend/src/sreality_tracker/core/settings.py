@@ -40,6 +40,10 @@ class Settings(BaseSettings):
     http_max_attempts: int = Field(default=3, ge=1, le=6)
     http_backoff_base_seconds: float = Field(default=0.5, ge=0, le=30)
     http_jitter_max_seconds: float = Field(default=0.25, ge=0, le=10)
+    routes_project_id: str | None = None
+    routes_access_token: SecretStr | None = None
+    routes_daily_request_limit: int = Field(default=300, ge=1, le=300)
+    routes_max_attempts: int = Field(default=3, ge=1, le=6)
 
     @field_validator("database_url")
     @classmethod
@@ -65,6 +69,12 @@ class Settings(BaseSettings):
     def database_url_value(self) -> str:
         """Return the database URL only at the adapter boundary."""
         return self.database_url.get_secret_value()
+
+    def routes_access_token_value(self) -> str | None:
+        """Return an optional short-lived token only at the provider boundary."""
+        if self.routes_access_token is None:
+            return None
+        return self.routes_access_token.get_secret_value()
 
 
 def load_settings() -> Settings:

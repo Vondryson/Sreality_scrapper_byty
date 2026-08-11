@@ -3,11 +3,11 @@
 ## Aktuální stav
 
 - Poslední aktualizace: 2026-08-11
-- Aktuální milník: M1 – implementace PostgreSQL pipeline dokončena; plný řízený live běh brány dosud nebyl spuštěn (cloudová brána `M0-05` zůstává blokovaná)
-- Aktuální hlavní task: žádný – sekce M1 je implementačně dokončená
-- Následující doporučený task: `M2-01` – Definovat a verzovat referenční bod Prahy
-- Blokátory: read-only ověření projektu/billingu/API selhává při obnově `gcloud` OAuth tokenu kvůli lokálnímu TLS certifikátu; je potřeba kontrola správným osobním účtem
-- Souhrn: 15 dokončeno, 0 rozpracováno, 1 blokováno, 27 čeká
+- Aktuální milník: M2 – Vzdálenosti, FastAPI a zabezpečené operace (cloudová brána `M0-05` zůstává blokovaná)
+- Aktuální hlavní task: `M2-08` – Implementovat Google OAuth, allowlist a provozní endpointy
+- Následující doporučený task: `M3-01` – Založit Next.js frontend a UI základ
+- Blokátory: celková nákladová brána M0-05 zůstává otevřená do uzavření kompletního GCP rozpočtu; lokální implementaci M2 neblokuje
+- Souhrn: 22 dokončeno, 1 rozpracováno, 1 blokováno, 19 čeká
 
 ## Legenda
 
@@ -45,14 +45,14 @@ Najednou má být `[~]` označen nejvýše jeden hlavní task. Dílčí paraleln
 
 ## M2 – Vzdálenosti, FastAPI a zabezpečené operace
 
-- [ ] `M2-01` – Definovat a verzovat referenční bod Prahy.
-- [ ] `M2-02` – Implementovat vzdušnou vzdálenost.
-- [ ] `M2-03` – Integrovat Google Routes s cache a kvótou.
-- [ ] `M2-04` – Založit FastAPI aplikaci a API kontrakty.
-- [ ] `M2-05` – Implementovat seznam, filtry, řazení a stránkování.
-- [ ] `M2-06` – Implementovat detail, historii, mapu a medián.
-- [ ] `M2-07` – Implementovat oblíbené, poznámky a archivaci fotografií.
-- [ ] `M2-08` – Implementovat Google OAuth, allowlist a provozní endpointy.
+- [x] `M2-01` – Definovat a verzovat referenční bod Prahy.
+- [x] `M2-02` – Implementovat vzdušnou vzdálenost.
+- [x] `M2-03` – Integrovat Google Routes s cache a kvótou.
+- [x] `M2-04` – Založit FastAPI aplikaci a API kontrakty.
+- [x] `M2-05` – Implementovat seznam, filtry, řazení a stránkování.
+- [x] `M2-06` – Implementovat detail, historii, mapu a medián.
+- [x] `M2-07` – Implementovat oblíbené, poznámky a archivaci fotografií.
+- [~] `M2-08` – Implementovat Google OAuth, allowlist a provozní endpointy.
 
 ## M3 – Český responzivní frontend
 
@@ -84,10 +84,14 @@ Najednou má být `[~]` označen nejvýše jeden hlavní task. Dílčí paraleln
 
 ## Pracovní poznámky k aktivnímu tasku
 
-### Žádný aktivní task
+### 2026-08-11 – `M2-08`
 
-- M1-01 až M1-10 jsou implementované a testované.
-- Před zahájením M2 je doporučeno commitnout současný celek a samostatně naplánovat plný live běh, protože znamená tisíce zdvořile sekvenčních requestů.
+- Plán: napojit owner dependency na ověřenou Google identitu a allowlist, přidat bezpečnou session a chráněný stav/ruční spuštění scraperu.
+- Rozsah: auth konfigurace, OAuth/session adaptéry, middleware/dependencies, provozní kontrakty a testy zákazu přístupu.
+- Rizika: tokeny a OAuth chyby nesmějí unikat do logů/odpovědí; ruční spuštění musí mít idempotency ochranu a nesmí blokovat request proces.
+- Předpoklady: live OAuth client credential a redirect URI budou konfigurované v osobním projektu; lokální kryptografické a autorizační chování lze dokončit bez nich.
+- Provedené testy: M2-03 prošel plnou sadou 102 passed, 2 explicitní live skipped; 42 backend source souborů prošlo strict mypy a dotčené soubory Ruff.
+- Zbývá: implementovat auth/session a provozní endpointy, integračně ověřit allowlist, CSRF/session vlastnosti a manuální trigger.
 
 Při zahájení tasku sem zapsat:
 
@@ -102,12 +106,12 @@ Po dokončení stručnou poznámku přesunout do historie níže.
 
 ## Blokátory a otevřené otázky
 
-### `M0-05` – potvrzení cílového GCP projektu
+### `M0-05` – dokončení cloudové nákladové brány
 
-- Blokující podmínka: nelze potvrdit billing a API stav projektu `sreality-scrapper-504307`.
-- Ověřeno: veřejné ceny a regionální dostupnost, lokální SDK, explicitní read-only pokusy bez změny aktivního pracovního projektu.
-- Příčina: `gcloud` selže při obnově OAuth tokenu na lokální chybě důvěryhodnosti TLS; dostupný aktivní účet navíc není osobní účet vlastníka cílového projektu.
-- Chybí: kontrola v Cloud Console správným účtem, daňový režim billing accountu a uživatelovo potvrzení podmíněného cloudového pokračování při odhadu kolem horního rozpočtového limitu.
+- Blokující podmínka: zbývá dokončit technické/API a rozpočtové pojistky cloudové brány.
+- Ověřeno: účet `vondryswow@gmail.com` má přístup k aktivnímu osobnímu projektu `sreality-scrapper-504307` (`projectNumber=545468906541`), projekt má aktivní billing a `routes.googleapis.com` je zapnuté. Pracovní konfigurace `default` a projekt `maiven-lab-dev` zůstaly beze změny a jsou výslovně mimo rozsah tohoto projektu.
+- Vedlejší změna: při read-only kontrole Google CLI se souhlasem uživatele automaticky zapnulo `cloudresourcemanager.googleapis.com`; tato řídicí služba sama nespouští aplikační workload.
+- Chybí: ověřit krátkodobý OAuth credential, provést jeden kontrolovaný request a uzavřít celkovou kalkulaci/rozhodnutí cloudového provozu.
 - Dopad: blokuje uzavření brány M0 a cloudové tasky závislé na M0-05 (`M2-03`, `M4-02`); neblokuje lokální návrh databáze od `M1-01`.
 
 Položka označená `[!]` musí zde uvést:
@@ -118,6 +122,69 @@ Položka označená `[!]` musí zde uvést:
 - které další tasky blokuje.
 
 ## Historie dokončené práce
+
+### 2026-08-11 – `M2-03`
+
+- Ověřen osobní GCP projekt, aktivní billing, zapnuté Routes API a denní consumer quota 300 pro `compute_routes_requests`; pracovní projekt zůstal mimo rozsah.
+- Jediný live OAuth request Praha–Brno v režimu `TRAFFIC_UNAWARE` a s minimálním field maskem vrátil `207588 m` a `8233 s`; sanitizovaný důkaz je v `docs/discovery/m2-03-google-routes-validation.md`.
+- Přidán odolný Compute Routes klient s retry pouze pro 429/5xx/transport, bezpečnými chybami, procesním request budgetem a logovatelnou metrikou každého provider callu.
+- Silniční vzdálenost a doba jízdy se cachují podle listingu, verze reference a hashe GPS; 8233 sekund se konzervativně ukládá jako 138 minut.
+- Pipeline používá cache a výpadek Routes nikdy nezruší uloženou nabídku; samostatný backfill projde i přes již cachované položky a reportuje requesty/cache/failure.
+- Přidán explicitně opt-in live test omezený na jeden request a CLI `routes-backfill --limit 1..300` s krátkodobým tokenem pouze v process environment.
+- Ověření: 102 passed, 2 explicitní live skipped; Ruff, strict mypy pro 42 source souborů a `git diff --check` čisté.
+
+### 2026-08-11 – `M2-07`
+
+- Přidán owner-only `PATCH /api/v1/listings/{listing_id}/user-data` s částečnou změnou oblíbeného stavu a samostatné soukromé poznámky.
+- Autorizační seam odmítá chybějící ověřenou identitu jednotnou 401 odpovědí a je připravený pro Google OAuth wiring v M2-08.
+- Oblíbení spouští archivaci po jednotlivých obrázcích; externí chyba nevrací uživatelský stav ani úspěšné archivace.
+- Lokální archiv používá immutable create-only zápis a deterministický klíč `favorite-images/{listing_id}/{source_fingerprint}.bin`.
+- Již archivované fotografie se nestahují znovu, `failed` položky se při dalším oblíbení retryují a odznačení archiv nemaže.
+- Ověření: failure/retry/idempotency PostgreSQL test, API 401 test a unit testy immutable archivu/host allowlistu; plná sada 92 passed, 1 live skipped, Ruff/strict mypy a `git diff --check` čisté.
+
+### 2026-08-11 – `M2-06`
+
+- Přidán detail nabídky s parametry, cenami, lokalitou, plochami, fotografiemi, aktuálními vzdálenostmi, aktivitou a soukromým stavem.
+- Chronologická historie spojuje každé cenové pozorování se stavem konkrétního scraper běhu a samostatně vrací auditní události.
+- Mapový endpoint sdílí filtry seznamu a vrací pouze nabídky s kompletní dvojicí zeměpisných souřadnic.
+- Aktuální medián používá aktuální filtrovaný stav; historická řada počítá snapshotové ceny a plochy zvlášť pro každý `succeeded` run.
+- `NULL` ceny/ceny na vyžádání a `partial`/`failed` běhy se z historického mediánu vylučují; test pokrývá i extrémní cenu v partial runu.
+- Ověření: 84 passed, 1 explicitní live skipped; nové API moduly prošly Ruff a strict mypy, `git diff --check` je čistý.
+
+### 2026-08-11 – `M2-05`
+
+- Přidán `/api/v1/listings` se serverovým stránkováním (1–100 položek), celkovým počtem a počtem stran.
+- Filtry pokrývají aktivitu/poslední-run události, kategorii, kraj, okres, cenu, plochy, cenu za m², vzdušnou/silniční vzdálenost, dobu jízdy a oblíbené.
+- `new`, `price_decreased` a `reactivated` se vztahují k poslednímu úspěšnému runu, nikoli k libovolné historické události.
+- Řazení je omezené enum whitelistou a vždy doplněné stabilním externím ID; NULL ceny a vzdálenosti se řadí nakonec.
+- PostgreSQL test ověřuje cenové stránkování a kombinaci latest-run/kategorie/kraje/ceny/oblíbených/vzdálenosti; invalidní rozsah vrací jednotnou 422 chybu.
+- Plná sada: 83 passed, 1 live skipped; 21 dotčených souborů prošlo Ruff, strict mypy a `git diff --check`.
+
+### 2026-08-11 – `M2-04`
+
+- Přidána FastAPI 0.139 aplikační factory bez import-time konfigurace či DB spojení a Uvicorn 0.51 runtime.
+- Všechny aplikační routy jsou pod `/api/v1`; OpenAPI obsahuje verzi balíčku a stabilní response modely.
+- App container poskytuje explicitní settings, engine, session factory a readiness probe přes dependency injection.
+- Liveness je nezávislá na DB, readiness používá read-only `SELECT 1`; vlastnictví engine určuje bezpečné dispose při lifespan shutdownu.
+- API chyby včetně 404, validace, readiness a neočekávané výjimky mají jednotný bezpečný envelope bez interních detailů.
+- Ověření: contract testy pokrývají health, readiness failure, 404, OpenAPI a request-scoped session; plná sada 81 passed, 1 live skipped, Ruff/strict mypy čisté.
+
+### 2026-08-11 – `M2-02`
+
+- Přidán deterministický Haversinův výpočet s IUGG středním poloměrem Země a striktní validací párových WGS84 souřadnic.
+- Cílové souřadnice mají stabilní SHA-256 fingerprint na sedm desetinných míst; chybějící, neúplné nebo nevalidní GPS se neukládají.
+- Pipeline idempotentně ukládá lokální provider `local_haversine`/`straight_line` do `listing_distances`, zaokrouhlený na 0,001 km.
+- Opakovaná pozorování stejných souřadnic používají existující cache řádek; změna cíle nebo reference vytvoří odlišnou cache identitu.
+- Ověření: známý bod Praha–Brno vychází 186,221 km; unit a PostgreSQL testy pokrývají nulovou/symetrickou vzdálenost, invalidní GPS a dvě cache položky pro dva listingy.
+- Plná sada: 78 passed, 1 live skipped; dotčený kód prošel Ruff, strict mypy a `git diff --check`.
+
+### 2026-08-11 – `M2-01`
+
+- Přidán neměnný centrální registr `ReferencePoint` s validací WGS84, stabilním klíčem, kladnou verzí a coordinate hashem.
+- Praha v1 používá adresní místo RÚIAN 21714746 na Mariánském náměstí 2/2: `50.0871072, 14.4178281`.
+- Cache identita obsahuje klíč, verzi a SHA-256 souřadnic normalizovaných na sedm desetinných míst.
+- ADR `0001-prague-reference-point.md` dokumentuje zdroje, důvody, omezení a pravidlo, že změna souřadnic musí vytvořit novou verzi.
+- Ověření: 9 unit testů pokrývá centrální lookup, neměnnost, hash, změnu verze a nevalidní konfigurace; Ruff a strict mypy prošly.
 
 ### 2026-08-11 – `M1-10`
 

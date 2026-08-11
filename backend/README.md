@@ -151,3 +151,56 @@ CLI vypisuje jediný strojově čitelný JSON objekt a při chybě zveřejní po
 výjimky, nikoli credentials nebo obsah odpovědi. Lokální `run` používá
 `SREALITY_RAW_STORAGE_PATH`; produkční volba GCS adaptéru patří do cloudového
 wiringu.
+
+## Google Routes
+
+Silniční vzdálenost používá výhradně Compute Routes `DRIVE` s
+`TRAFFIC_UNAWARE` a minimálním field maskem `distanceMeters,duration`. Výsledek
+se trvale cachuje podle listingu, verze referenční Prahy a hashe cílových GPS.
+Chyba poskytovatele nevrací transakci nabídky; chybějící trasu lze retryovat:
+
+```powershell
+$env:SREALITY_ROUTES_PROJECT_ID = "sreality-scrapper-504307"
+$env:SREALITY_ROUTES_ACCESS_TOKEN = gcloud auth print-access-token --configuration=sreality-tracker
+sreality-scrape routes-backfill --limit 300
+Remove-Item Env:SREALITY_ROUTES_ACCESS_TOKEN
+```
+
+Backfill nikdy nepřijme limit vyšší než 300 a klient má samostatný procesní
+budget. Projektová denní consumer quota 300 zůstává hlavní tvrdou pojistkou.
+Výstup CLI obsahuje `provider_requests`, `cache_hits`, `created` a `failed`.
+
+## FastAPI
+
+Aplikační factory je `sreality_tracker.api.create_app`; načtení modulu samo o
+sobě nečte environment ani neotevírá databázi. Lokální server lze spustit:
+
+```powershell
+uvicorn sreality_tracker.api.app:create_app --factory --host 127.0.0.1 --port 8000
+```
+
+Veřejný kontrakt je verzovaný pod `/api/v1`. Liveness
+`/api/v1/health/live` nekontroluje externí závislosti, readiness
+`/api/v1/health/ready` provádí read-only DB probe. Chyby mají jednotný tvar
+`{"error":{"code":"...","message":"..."}}` a OpenAPI je dostupné na
+`/openapi.json`. Request-scoped SQLAlchemy session se získává přes FastAPI
+dependency injection; autentizace bude doplněna v M2-08.
+
+Datové endpointy M2:
+
+- `GET /api/v1/listings` – filtrovaný, řazený a stránkovaný seznam,
+- `GET /api/v1/listings/{listing_id}` – detail včetně fotografií a vzdáleností,
+- `GET /api/v1/listings/{listing_id}/history` – ceny a události svázané s běhy,
+- `GET /api/v1/map/listings` – filtrované nabídky s kompletní GPS dvojicí,
+- `GET /api/v1/analytics/price-medians` – aktuální a historický filtrovaný medián.
+- `PATCH /api/v1/listings/{listing_id}/user-data` – owner-only oblíbený stav a poznámka.
+
+Historické mediány používají snapshotové ceny a plochy z jednotlivých
+úspěšných běhů. Neúspěšné/částečné běhy, `NULL` ceny a ceny na vyžádání se do
+historické řady nezapočítávají.
+
+Zápis soukromých dat vyžaduje ověřenou owner identitu. Oblíbení nabídky
+spustí odolnou archivaci jejích fotografií: archivní klíč je deterministický
+podle interního listing ID a SHA-256 fingerprintu zdroje, již archivované
+obrázky se nestahují znovu a jednotlivé chyby zůstanou ve stavu `failed` pro
+pozdější retry. Odznačení nabídky archiv nemaže.
