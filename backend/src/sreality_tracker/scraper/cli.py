@@ -16,6 +16,8 @@ from sreality_tracker.core.logging import configure_logging
 from sreality_tracker.core.settings import ConfigurationError, Settings, load_settings
 from sreality_tracker.db.models import ScrapeRunStatus, ScrapeRunTrigger
 from sreality_tracker.db.session import create_database_engine, create_session_factory
+from sreality_tracker.distances.road import BackfillResult, RoadDistanceEnricher
+from sreality_tracker.distances.routes import RoutesClient
 from sreality_tracker.scraper.client import SrealityClient
 from sreality_tracker.scraper.pipeline import RunResult, ScrapePipeline
 from sreality_tracker.scraper.source import SrealityListingSource
@@ -42,6 +44,11 @@ def build_parser() -> argparse.ArgumentParser:
         choices=[item.value for item in ScrapeRunTrigger],
         default=ScrapeRunTrigger.MANUAL.value,
     )
+    backfill_parser = subparsers.add_parser(
+        "routes-backfill",
+        help="fill missing road distances with the configured bounded Routes quota",
+    )
+    backfill_parser.add_argument("--limit", type=int, default=300, choices=range(1, 301))
     return parser
 
 
@@ -54,6 +61,10 @@ def main(argv: Sequence[str] | None = None) -> int:
             _check_database(settings)
             _write_json({"status": "ready", "mode": "read_only"})
             return 0
+        if args.command == "routes-backfill":
+            backfill = _run_routes_backfill(settings, limit=int(args.limit))
+            _write_json(_backfill_payload(backfill))
+            return 0 if backfill.failed == 0 else 1
         result = _run_pipeline(
             settings,
             logical_key=str(args.logical_key),
@@ -91,13 +102,27 @@ def _run_pipeline(settings: Settings, *, logical_key: str, trigger: ScrapeRunTri
             backoff_base_seconds=settings.http_backoff_base_seconds,
             jitter_max_seconds=settings.http_jitter_max_seconds,
         ) as client:
+            session_factory = create_session_factory(engine)
+            routes_client = _routes_client(settings)
             pipeline = ScrapePipeline(
-                session_factory=create_session_factory(engine),
+                session_factory=session_factory,
                 source=SrealityListingSource(client),
                 raw_storage=LocalRawStorage(Path.cwd() / settings.raw_storage_path),
                 scraper_version=__version__,
+                road_distance_enricher=(
+                    None
+                    if routes_client is None
+                    else RoadDistanceEnricher(
+                        session_factory=session_factory,
+                        client=routes_client,
+                    )
+                ),
             )
-            return pipeline.execute(logical_key=logical_key, trigger=trigger)
+            try:
+                return pipeline.execute(logical_key=logical_key, trigger=trigger)
+            finally:
+                if routes_client is not None:
+                    routes_client.close()
     finally:
         engine.dispose()
 
@@ -114,6 +139,51 @@ def _result_payload(result: RunResult) -> dict[str, object]:
         "deactivated_count": result.deactivated_count,
         "chata_complete": result.chata_complete,
         "chalupa_complete": result.chalupa_complete,
+    }
+
+
+def _run_routes_backfill(settings: Settings, *, limit: int) -> BackfillResult:
+    client = _routes_client(settings, required=True)
+    assert client is not None
+    engine = create_database_engine(settings.database_url_value())
+    try:
+        return RoadDistanceEnricher(
+            session_factory=create_session_factory(engine),
+            client=client,
+        ).backfill(limit=min(limit, settings.routes_daily_request_limit))
+    finally:
+        client.close()
+        engine.dispose()
+
+
+def _routes_client(settings: Settings, *, required: bool = False) -> RoutesClient | None:
+    token = settings.routes_access_token_value()
+    project_id = settings.routes_project_id
+    if token is None or project_id is None:
+        if required:
+            raise ConfigurationError(
+                "Routes backfill requires routes_project_id and a short-lived routes_access_token"
+            )
+        return None
+    return RoutesClient(
+        project_id=project_id,
+        access_token_provider=lambda: token,
+        timeout_seconds=settings.http_timeout_seconds,
+        max_attempts=settings.routes_max_attempts,
+        request_limit=settings.routes_daily_request_limit,
+        backoff_base_seconds=settings.http_backoff_base_seconds,
+        jitter_max_seconds=settings.http_jitter_max_seconds,
+    )
+
+
+def _backfill_payload(result: BackfillResult) -> dict[str, object]:
+    return {
+        "status": "succeeded" if result.failed == 0 else "partial",
+        "considered": result.considered,
+        "created": result.created,
+        "cache_hits": result.cache_hits,
+        "failed": result.failed,
+        "provider_requests": result.provider_requests,
     }
 
 

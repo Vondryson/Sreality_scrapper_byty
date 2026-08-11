@@ -21,6 +21,8 @@ from sreality_tracker.db.models import (
     ScrapeRunStatus,
     ScrapeRunTrigger,
 )
+from sreality_tracker.distances.persistence import ensure_air_distance
+from sreality_tracker.distances.road import RoadDistanceEnricher
 from sreality_tracker.domain.events import (
     EventDraft,
     ListingEventType,
@@ -65,6 +67,7 @@ class ScrapePipeline:
         source: ListingSource,
         raw_storage: RawStorage,
         scraper_version: str,
+        road_distance_enricher: RoadDistanceEnricher | None = None,
         clock: Callable[[], datetime] = lambda: datetime.now(UTC),
     ) -> None:
         if not scraper_version.strip():
@@ -73,6 +76,7 @@ class ScrapePipeline:
         self._source = source
         self._raw_storage = raw_storage
         self._scraper_version = scraper_version
+        self._road_distance_enricher = road_distance_enricher
         self._clock = clock
 
     def execute(
@@ -92,7 +96,9 @@ class ScrapePipeline:
         for kind in ListingKind:
             try:
                 for fetched in self._source.iter_kind(kind):
-                    self._persist_detail(run.id, fetched.detail)
+                    listing_id = self._persist_detail(run.id, fetched.detail)
+                    if listing_id is not None and self._road_distance_enricher is not None:
+                        self._road_distance_enricher.enrich(listing_id)
                 completed.add(kind)
             except Exception as error:
                 errors.append((kind, error))
@@ -119,7 +125,7 @@ class ScrapePipeline:
         with self._session_factory() as session:
             return session.get_one(ScrapeRun, run_id)
 
-    def _persist_detail(self, run_id: UUID, detail: ListingDetail) -> None:
+    def _persist_detail(self, run_id: UUID, detail: ListingDetail) -> int | None:
         observed_at = _aware(self._clock())
         snapshot = _snapshot(detail)
         detail_hash = serialize_payload(_detail_content(detail)).sha256
@@ -137,7 +143,7 @@ class ScrapePipeline:
                     )
                 )
                 if existing_observation is not None:
-                    return
+                    return listing.id
 
             previous_state = (
                 None
@@ -176,6 +182,7 @@ class ScrapePipeline:
                 listing.inactive_at = None
 
             _apply_current_state(listing, detail, detail_hash, observed_at)
+            ensure_air_distance(session, listing=listing, calculated_at=observed_at)
             _upsert_images(session, listing, detail.images, observed_at)
             current_state = ListingState(
                 price_czk=detail.price.price_czk,
@@ -201,6 +208,7 @@ class ScrapePipeline:
                     snapshot_json=snapshot,
                 )
             )
+            return listing.id
 
     def _finish_run(
         self,
