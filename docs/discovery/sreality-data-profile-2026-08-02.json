@@ -1,0 +1,1022 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-08-02T13:03:28.769039+00:00",
+  "duration_seconds": 22.829,
+  "request_count": 22,
+  "delay_seconds": 0.75,
+  "stores_listing_content_or_image_urls": false,
+  "sample": {
+    "details_total": 10,
+    "details_by_category": {
+      "chalupa": 5,
+      "chata": 5
+    },
+    "sampling_method": "first N newest results from page 1 per category",
+    "limitations": [
+      "Small non-random sample; results are directional, not population estimates.",
+      "One image per sampled listing was downloaded only to measure bytes."
+    ]
+  },
+  "top_level_fields": {
+    "categoryMainCb": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 10,
+      "null": 0,
+      "types": {
+        "object": 10
+      }
+    },
+    "categorySubCb": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 10,
+      "null": 0,
+      "types": {
+        "object": 10
+      }
+    },
+    "categoryTypeCb": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 10,
+      "null": 0,
+      "types": {
+        "object": 10
+      }
+    },
+    "description": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 10,
+      "null": 0,
+      "types": {
+        "string": 10
+      }
+    },
+    "estateArea": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 10,
+      "null": 0,
+      "types": {
+        "integer": 10
+      }
+    },
+    "extendedPois": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 10,
+      "null": 0,
+      "types": {
+        "object": 10
+      }
+    },
+    "images": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 10,
+      "null": 0,
+      "types": {
+        "array": 10
+      }
+    },
+    "isExclusively": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 10,
+      "null": 0,
+      "types": {
+        "boolean": 10
+      }
+    },
+    "locality": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 10,
+      "null": 0,
+      "types": {
+        "object": 10
+      }
+    },
+    "matterportUrl": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 10,
+      "null": 0,
+      "types": {
+        "string": 10
+      }
+    },
+    "name": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 10,
+      "null": 0,
+      "types": {
+        "string": 10
+      }
+    },
+    "nearest": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 10,
+      "null": 0,
+      "types": {
+        "array": 10
+      }
+    },
+    "note": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 0,
+      "null": 10,
+      "types": {
+        "null": 10
+      }
+    },
+    "objectType": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 10,
+      "null": 0,
+      "types": {
+        "object": 10
+      }
+    },
+    "panorama": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 10,
+      "null": 0,
+      "types": {
+        "boolean": 10
+      }
+    },
+    "panoramaData": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 2,
+      "null": 8,
+      "types": {
+        "null": 8,
+        "object": 2
+      }
+    },
+    "params": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 10,
+      "null": 0,
+      "types": {
+        "object": 10
+      }
+    },
+    "premise": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 10,
+      "null": 0,
+      "types": {
+        "object": 10
+      }
+    },
+    "price": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 10,
+      "null": 0,
+      "types": {
+        "integer": 10
+      }
+    },
+    "priceCurrencyCb": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 10,
+      "null": 0,
+      "types": {
+        "object": 10
+      }
+    },
+    "priceCzk": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 10,
+      "null": 0,
+      "types": {
+        "integer": 10
+      }
+    },
+    "priceCzkPerSqM": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 10,
+      "null": 0,
+      "types": {
+        "integer": 10
+      }
+    },
+    "priceSummaryCzk": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 10,
+      "null": 0,
+      "types": {
+        "integer": 10
+      }
+    },
+    "priceSummaryOldCzk": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 0,
+      "null": 10,
+      "types": {
+        "null": 10
+      }
+    },
+    "priceSummaryUnitCb": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 10,
+      "null": 0,
+      "types": {
+        "object": 10
+      }
+    },
+    "priceUnitCb": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 10,
+      "null": 0,
+      "types": {
+        "object": 10
+      }
+    },
+    "roomCountCb": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 10,
+      "null": 0,
+      "types": {
+        "object": 10
+      }
+    },
+    "rus": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 0,
+      "null": 10,
+      "types": {
+        "null": 10
+      }
+    },
+    "rusReply": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 0,
+      "null": 10,
+      "types": {
+        "null": 10
+      }
+    },
+    "seller": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 10,
+      "null": 0,
+      "types": {
+        "object": 10
+      }
+    },
+    "videos": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 10,
+      "null": 0,
+      "types": {
+        "array": 10
+      }
+    }
+  },
+  "params_fields": {
+    "acceptanceYear": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 2,
+      "null": 8,
+      "types": {
+        "integer": 2,
+        "null": 8
+      }
+    },
+    "advertCode": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 9,
+      "null": 1,
+      "types": {
+        "null": 1,
+        "string": 9
+      }
+    },
+    "annuity": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 0,
+      "null": 10,
+      "types": {
+        "null": 10
+      }
+    },
+    "basin": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 10,
+      "null": 0,
+      "types": {
+        "boolean": 10
+      }
+    },
+    "basinArea": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 0,
+      "null": 10,
+      "types": {
+        "null": 10
+      }
+    },
+    "beginningDate": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 0,
+      "null": 10,
+      "types": {
+        "null": 10
+      }
+    },
+    "buildingArea": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 5,
+      "null": 5,
+      "types": {
+        "integer": 5,
+        "null": 5
+      }
+    },
+    "buildingCondition": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 10,
+      "null": 0,
+      "types": {
+        "object": 10
+      }
+    },
+    "buildingType": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 10,
+      "null": 0,
+      "types": {
+        "object": 10
+      }
+    },
+    "cellar": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 10,
+      "null": 0,
+      "types": {
+        "boolean": 10
+      }
+    },
+    "cellarArea": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 4,
+      "null": 6,
+      "types": {
+        "integer": 4,
+        "null": 6
+      }
+    },
+    "circuitBreakerCb": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 0,
+      "null": 10,
+      "types": {
+        "null": 10
+      }
+    },
+    "costOfLiving": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 10,
+      "null": 0,
+      "types": {
+        "string": 10
+      }
+    },
+    "easyAccess": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 10,
+      "null": 0,
+      "types": {
+        "object": 10
+      }
+    },
+    "edited": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 10,
+      "null": 0,
+      "types": {
+        "string": 10
+      }
+    },
+    "electricitySet": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 10,
+      "null": 0,
+      "types": {
+        "array": 10
+      }
+    },
+    "elevator": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 10,
+      "null": 0,
+      "types": {
+        "object": 10
+      }
+    },
+    "energyEfficiencyRating": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 10,
+      "null": 0,
+      "types": {
+        "object": 10
+      }
+    },
+    "energyPerformanceCertificate": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 10,
+      "null": 0,
+      "types": {
+        "object": 10
+      }
+    },
+    "energyPerformanceSummary": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 0,
+      "null": 10,
+      "types": {
+        "null": 10
+      }
+    },
+    "estateArea": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 10,
+      "null": 0,
+      "types": {
+        "integer": 10
+      }
+    },
+    "finishDate": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 0,
+      "null": 10,
+      "types": {
+        "null": 10
+      }
+    },
+    "firstTourDate": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 0,
+      "null": 10,
+      "types": {
+        "null": 10
+      }
+    },
+    "firstTourDateTo": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 0,
+      "null": 10,
+      "types": {
+        "null": 10
+      }
+    },
+    "floorArea": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 3,
+      "null": 7,
+      "types": {
+        "integer": 3,
+        "null": 7
+      }
+    },
+    "floors": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 7,
+      "null": 3,
+      "types": {
+        "integer": 7,
+        "null": 3
+      }
+    },
+    "ftvPanels": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 10,
+      "null": 0,
+      "types": {
+        "boolean": 10
+      }
+    },
+    "furnished": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 10,
+      "null": 0,
+      "types": {
+        "object": 10
+      }
+    },
+    "garage": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 10,
+      "null": 0,
+      "types": {
+        "boolean": 10
+      }
+    },
+    "garageCount": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 4,
+      "null": 6,
+      "types": {
+        "integer": 4,
+        "null": 6
+      }
+    },
+    "gardenArea": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 2,
+      "null": 8,
+      "types": {
+        "integer": 2,
+        "null": 8
+      }
+    },
+    "garret": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 8,
+      "null": 2,
+      "types": {
+        "boolean": 8,
+        "null": 2
+      }
+    },
+    "gasSet": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 10,
+      "null": 0,
+      "types": {
+        "array": 10
+      }
+    },
+    "gullySet": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 10,
+      "null": 0,
+      "types": {
+        "array": 10
+      }
+    },
+    "heatingElementSet": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 10,
+      "null": 0,
+      "types": {
+        "array": 10
+      }
+    },
+    "heatingSet": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 10,
+      "null": 0,
+      "types": {
+        "array": 10
+      }
+    },
+    "heatingSourceSet": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 10,
+      "null": 0,
+      "types": {
+        "array": 10
+      }
+    },
+    "internetConnectionProvider": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 0,
+      "null": 10,
+      "types": {
+        "null": 10
+      }
+    },
+    "internetConnectionSpeed": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 0,
+      "null": 10,
+      "types": {
+        "null": 10
+      }
+    },
+    "internetConnectionTypeSet": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 10,
+      "null": 0,
+      "types": {
+        "array": 10
+      }
+    },
+    "keywords": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 9,
+      "null": 1,
+      "types": {
+        "array": 9,
+        "null": 1
+      }
+    },
+    "lowEnergy": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 10,
+      "null": 0,
+      "types": {
+        "boolean": 10
+      }
+    },
+    "objectAge": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 0,
+      "null": 10,
+      "types": {
+        "null": 10
+      }
+    },
+    "objectKind": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 10,
+      "null": 0,
+      "types": {
+        "object": 10
+      }
+    },
+    "objectLocation": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 10,
+      "null": 0,
+      "types": {
+        "object": 10
+      }
+    },
+    "objectType": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 10,
+      "null": 0,
+      "types": {
+        "object": 10
+      }
+    },
+    "parking": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 2,
+      "null": 8,
+      "types": {
+        "integer": 2,
+        "null": 8
+      }
+    },
+    "parkingLots": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 10,
+      "null": 0,
+      "types": {
+        "boolean": 10
+      }
+    },
+    "phaseDistributionsCb": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 0,
+      "null": 10,
+      "types": {
+        "null": 10
+      }
+    },
+    "priceFlagNegotiationCb": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 10,
+      "null": 0,
+      "types": {
+        "boolean": 10
+      }
+    },
+    "priceNote": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 8,
+      "null": 2,
+      "types": {
+        "null": 2,
+        "string": 8
+      }
+    },
+    "project": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 0,
+      "null": 10,
+      "types": {
+        "null": 10
+      }
+    },
+    "protection": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 10,
+      "null": 0,
+      "types": {
+        "object": 10
+      }
+    },
+    "readyDate": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 3,
+      "null": 7,
+      "types": {
+        "null": 7,
+        "string": 3
+      }
+    },
+    "reconstructionYear": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 0,
+      "null": 10,
+      "types": {
+        "null": 10
+      }
+    },
+    "roadTypeSet": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 10,
+      "null": 0,
+      "types": {
+        "array": 10
+      }
+    },
+    "roomCountCb": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 10,
+      "null": 0,
+      "types": {
+        "object": 10
+      }
+    },
+    "sdnEnergyPerformanceAttachmentUrl": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 4,
+      "null": 6,
+      "types": {
+        "null": 6,
+        "string": 4
+      }
+    },
+    "since": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 10,
+      "null": 0,
+      "types": {
+        "string": 10
+      }
+    },
+    "solarPanels": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 9,
+      "null": 1,
+      "types": {
+        "boolean": 9,
+        "null": 1
+      }
+    },
+    "stateCb": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 10,
+      "null": 0,
+      "types": {
+        "object": 10
+      }
+    },
+    "stats": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 10,
+      "null": 0,
+      "types": {
+        "integer": 10
+      }
+    },
+    "surroundingsType": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 10,
+      "null": 0,
+      "types": {
+        "object": 10
+      }
+    },
+    "telecommunicationSet": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 10,
+      "null": 0,
+      "types": {
+        "array": 10
+      }
+    },
+    "transportSet": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 10,
+      "null": 0,
+      "types": {
+        "array": 10
+      }
+    },
+    "undergroundFloors": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 2,
+      "null": 8,
+      "types": {
+        "integer": 2,
+        "null": 8
+      }
+    },
+    "usableArea": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 10,
+      "null": 0,
+      "types": {
+        "integer": 10
+      }
+    },
+    "waterHeatSourceSet": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 10,
+      "null": 0,
+      "types": {
+        "array": 10
+      }
+    },
+    "waterSet": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 10,
+      "null": 0,
+      "types": {
+        "array": 10
+      }
+    },
+    "wellTypeSet": {
+      "present": 10,
+      "missing": 0,
+      "non_null": 10,
+      "null": 0,
+      "types": {
+        "array": 10
+      }
+    }
+  },
+  "numeric_variants": {
+    "priceCzk": {
+      "observed": 10,
+      "missing_or_non_numeric": 0,
+      "min": 0,
+      "median": 3660000.0,
+      "max": 6990000
+    },
+    "priceCzkPerSqM": {
+      "observed": 10,
+      "missing_or_non_numeric": 0,
+      "min": 0,
+      "median": 46335.5,
+      "max": 108621
+    },
+    "estateArea": {
+      "observed": 10,
+      "missing_or_non_numeric": 0,
+      "min": 338,
+      "median": 1480.0,
+      "max": 36850
+    },
+    "params.usableArea": {
+      "observed": 10,
+      "missing_or_non_numeric": 0,
+      "min": 35,
+      "median": 87.0,
+      "max": 503
+    },
+    "params.buildingArea": {
+      "observed": 5,
+      "missing_or_non_numeric": 5,
+      "min": 29,
+      "median": 160,
+      "max": 254
+    }
+  },
+  "images": {
+    "count_per_listing": {
+      "observed": 10,
+      "missing_or_non_numeric": 0,
+      "min": 5,
+      "median": 26.5,
+      "max": 39
+    },
+    "declared_width": {
+      "observed": 259,
+      "missing_or_non_numeric": 0,
+      "min": 515,
+      "median": 1600,
+      "max": 5712
+    },
+    "declared_height": {
+      "observed": 259,
+      "missing_or_non_numeric": 0,
+      "min": 409,
+      "median": 1066,
+      "max": 4284
+    },
+    "downloaded_file_bytes": {
+      "observed": 10,
+      "missing_or_non_numeric": 0,
+      "min": 28110,
+      "median": 96708.0,
+      "max": 242196
+    },
+    "download_failures": 0,
+    "measured_variant": "800x600 WebP quality 60 as rendered by the search page",
+    "observed_domains": {
+      "d18-a.sdn.cz": 259
+    }
+  }
+}
