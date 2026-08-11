@@ -3,11 +3,11 @@
 ## Aktuální stav
 
 - Poslední aktualizace: 2026-08-11
-- Aktuální milník: M1 – PostgreSQL a spolehlivá datová pipeline (cloudová brána `M0-05` zůstává blokovaná)
-- Aktuální hlavní task: `M1-06` – Implementovat raw-storage rozhraní
-- Následující doporučený task: `M1-07` – Implementovat běh a ukládání pozorování
+- Aktuální milník: M1 – implementace PostgreSQL pipeline dokončena; plný řízený live běh brány dosud nebyl spuštěn (cloudová brána `M0-05` zůstává blokovaná)
+- Aktuální hlavní task: žádný – sekce M1 je implementačně dokončená
+- Následující doporučený task: `M2-01` – Definovat a verzovat referenční bod Prahy
 - Blokátory: read-only ověření projektu/billingu/API selhává při obnově `gcloud` OAuth tokenu kvůli lokálnímu TLS certifikátu; je potřeba kontrola správným osobním účtem
-- Souhrn: 10 dokončeno, 1 rozpracováno, 1 blokováno, 31 čeká
+- Souhrn: 15 dokončeno, 0 rozpracováno, 1 blokováno, 27 čeká
 
 ## Legenda
 
@@ -37,11 +37,11 @@ Najednou má být `[~]` označen nejvýše jeden hlavní task. Dílčí paraleln
 - [x] `M1-03` – Zavést validovanou konfiguraci a strukturované logování.
 - [x] `M1-04` – Implementovat odolného Sreality HTTP klienta.
 - [x] `M1-05` – Implementovat tolerantní parser a doménové modely.
-- [~] `M1-06` – Implementovat raw-storage rozhraní.
-- [ ] `M1-07` – Implementovat běh a ukládání pozorování.
-- [ ] `M1-08` – Implementovat události a stavový automat nabídek.
-- [ ] `M1-09` – Přidat bezpečnostní bránu deaktivace.
-- [ ] `M1-10` – Dokončit CLI a testovací pokrytí pipeline.
+- [x] `M1-06` – Implementovat raw-storage rozhraní.
+- [x] `M1-07` – Implementovat běh a ukládání pozorování.
+- [x] `M1-08` – Implementovat události a stavový automat nabídek.
+- [x] `M1-09` – Přidat bezpečnostní bránu deaktivace.
+- [x] `M1-10` – Dokončit CLI a testovací pokrytí pipeline.
 
 ## M2 – Vzdálenosti, FastAPI a zabezpečené operace
 
@@ -84,14 +84,10 @@ Najednou má být `[~]` označen nejvýše jeden hlavní task. Dílčí paraleln
 
 ## Pracovní poznámky k aktivnímu tasku
 
-### 2026-08-11 – `M1-06`
+### Žádný aktivní task
 
-- Plán: zavést jednotné raw-storage rozhraní, deterministickou gzip serializaci a idempotentní lokální/GCS adaptéry adresované přes run/listing.
-- Rozsah: `sreality_tracker.storage`, unit testy lokálního adaptéru, mockované testy GCS a dokumentace object key/retence.
-- Rizika: opakovaný zápis stejného klíče s jiným obsahem nesmí tiše přepsat auditní payload; GCS testy nesmějí vyžadovat reálné credentials ani síť.
-- Předpoklady: kanonický object key obsahuje `run_id` a externí Sreality ID, payload je UTF-8 JSON komprimovaný gzip s deterministickým hashem.
-- Provedené testy: M1-05 prošel plnou sadou 43 passed, 1 live skipped; po reinstalaci Dockeru byl znovu ověřen PostgreSQL 16.10, Alembic head a bezpečný integrační migration round trip.
-- Zbývá: implementovat protokol a oba adaptéry, otestovat idempotenci, konflikt, kompresi a round trip.
+- M1-01 až M1-10 jsou implementované a testované.
+- Před zahájením M2 je doporučeno commitnout současný celek a samostatně naplánovat plný live běh, protože znamená tisíce zdvořile sekvenčních requestů.
 
 Při zahájení tasku sem zapsat:
 
@@ -122,6 +118,52 @@ Položka označená `[!]` musí zde uvést:
 - které další tasky blokuje.
 
 ## Historie dokončené práce
+
+### 2026-08-11 – `M1-10`
+
+- Přidán console entry point `sreality-scrape` s ručním `run` příkazem a povinným idempotency klíčem.
+- Read-only `check` ověří konfiguraci a `SELECT 1` bez DB zápisu a bez HTTP requestu; skutečný nainstalovaný entry point vrátil `{"status":"ready","mode":"read_only"}`.
+- CLI skládá settings, PostgreSQL session factory, lokální raw storage, odolný klient, stránkovaný source a pipeline; výstup je jeden JSON objekt.
+- Chyby CLI zveřejňují pouze typ výjimky, nikoli zprávu s potenciálními credentials nebo obsahem zdroje.
+- PostgreSQL rollback test záměrně vyvolá porušení image constraintu a ověřuje, že listing, observation i event chybného detailu nezůstanou v DB, zatímco druhá kategorie se korektně uloží jako partial run.
+- Závěrečná M1 regrese: 62 passed, 1 explicitní live skipped; 15 dotčených zdrojů/testů prošlo Ruff format/check a strict mypy, `git diff --check` je čistý.
+- Plný live scrape celé nabídky nebyl automaticky spuštěn: při potvrzeném objemu by znamenal tisíce sekvenčních requestů; je vhodné jej provést jako samostatně sledovaný řízený běh.
+
+### 2026-08-11 – `M1-09`
+
+- Hromadná deaktivace je dostupná pouze přes guard vyžadující dokončený `succeeded` run a `chata_complete = chalupa_complete = true`.
+- Výběr kandidátů používá absenci observation v aktuálním kompletním runu a zamyká pouze dosud aktivní listingy.
+- Deaktivace atomicky nastaví stav, `inactive_at`, auditní event a přesný `deactivated_count`; již neaktivní listing nevytvoří duplicitní událost.
+- Částečný či neúspěšný run gate vůbec nevolá a zachová aktivitu všech nenalezených nabídek.
+- Ověření: PostgreSQL test prokázal nulovou deaktivaci po selhání chalup a přesně jednu deaktivaci až po následujícím kompletním běhu.
+- Plná sada: 59 passed, 1 live skipped; dotčený kód prošel Ruff format/check, strict mypy a `git diff --check`.
+
+### 2026-08-11 – `M1-08`
+
+- Přidán čistý doménový stavový automat pro `created`, zvýšení/snížení ceny, změnu detailu, deaktivaci a reaktivaci.
+- Cena je oddělena od detail hashe, takže samotná cenová změna nevytváří falešnou událost `details_changed`; přechody ceny z/do neznámé hodnoty si nevymýšlejí směr.
+- Pipeline ukládá události ve stejné transakci jako aktuální stav a observation; unikátní DB omezení chrání retry stejného runu.
+- Návrat neaktivní nabídky obnoví původní listing řádek a přidá `reactivated`, takže historie zůstane zachovaná.
+- Přidána nízkoúrovňová deaktivační operace připravená pro povinnou complete-run bránu M1-09.
+- Ověření: unit testy přechodů a PostgreSQL historie pokrývají všech šest typů událostí; plná sada 58 passed, 1 live skipped a nový kód prošel Ruff/strict mypy.
+
+### 2026-08-11 – `M1-07`
+
+- Přidán stránkovaný `SrealityListingSource`, který používá skutečné detail odkazy ze search HTML, deduplikuje externí ID a validuje detail vůči očekávané kategorii.
+- `ScrapePipeline` zakládá unikátní auditní run, zpracuje chatu i chalupu a atomicky ukládá raw reference, aktuální listing, metadata obrázků a observation.
+- Opakovaný dokončený `logical_key` je no-op bez dalších zdrojových requestů; duplicita listingu uvnitř runu nevytvoří druhé pozorování.
+- Run eviduje úplnost obou kategorií, bezpečné typy chyb a stav `succeeded`, `partial` nebo `failed`, což připravuje bránu deaktivace.
+- Ověření: unit test HTML linků/stránkování a PostgreSQL integrační test dvou běhů ověřily upsert, změnu stavu, raw round trip a 4 unikátní pozorování pro 2 listingy × 2 runy.
+- Plná sada: 53 passed, 1 explicitní live skipped; všechny nové M1-06/M1-07 soubory prošly Ruff format/check a strict mypy.
+
+### 2026-08-11 – `M1-06`
+
+- Přidáno jednotné `RawStorage` rozhraní s lokálním filesystem a Google Cloud Storage adaptérem.
+- Payload se serializuje jako kanonický UTF-8 JSON, komprimuje deterministickým gzipem a adresuje klíčem `raw/runs/{run_id}/listings/{sreality_id}.json.gz`.
+- Zápis je create-only a idempotentní; stejný obsah je no-op, odlišný obsah na stejném klíči vyvolá konflikt místo přepsání auditních dat.
+- GCS adaptér používá generation precondition a CRC32C; jeho testy používají lokální fake bucket bez credentials a sítě.
+- Dokumentace backendu popisuje kontrakt, metadata a plánovanou 90denní retenci řízenou až infrastrukturou.
+- Ověření: 7 cílených storage testů a plná sada 50 passed, 1 live skipped; nový kód prošel Ruff a strict mypy. Celoprojektové kontroly nadále hlásí starší formátovací a typové nálezy v discovery skriptech mimo rozsah M1-06.
 
 ### 2026-08-11 – `M1-05`
 

@@ -32,6 +32,7 @@ from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from sreality_tracker.db.base import Base
+from sreality_tracker.domain.events import ListingEventType
 from sreality_tracker.domain.listings import ListingKind
 
 
@@ -45,15 +46,6 @@ class ScrapeRunStatus(StrEnum):
     SUCCEEDED = "succeeded"
     PARTIAL = "partial"
     FAILED = "failed"
-
-
-class ListingEventType(StrEnum):
-    CREATED = "created"
-    PRICE_DECREASED = "price_decreased"
-    PRICE_INCREASED = "price_increased"
-    DETAILS_CHANGED = "details_changed"
-    DEACTIVATED = "deactivated"
-    REACTIVATED = "reactivated"
 
 
 class ImageArchiveStatus(StrEnum):

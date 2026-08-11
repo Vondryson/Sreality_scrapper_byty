@@ -100,3 +100,54 @@ Analytická cena `0` se normalizuje na `None` s `price_on_request=true`, původn
 hodnota ale zůstává zachována. Typované modely obsahují klíčové ceny, plochy,
 lokalitu a metadata obrázků; současně uchovávají úplný detail a `params` mapping
 pro budoucí JSONB snapshot, takže nová zdrojová pole nejsou tiše zahozena.
+
+## Raw payload storage
+
+`sreality_tracker.storage.raw` poskytuje jednotné rozhraní pro lokální filesystem
+a neveřejný GCS bucket. Kanonický klíč má tvar:
+
+```text
+raw/runs/{run_id}/listings/{sreality_id}.json.gz
+```
+
+JSON se serializuje kanonicky do UTF-8 a ukládá jako deterministický gzip.
+Opakovaný zápis stejného obsahu je no-op; jiný obsah pod stejným klíčem vyvolá
+konflikt a nikdy se tiše nepřepíše. GCS adaptér používá create-only generation
+precondition a CRC32C kontrolu. Lokální root se předává explicitně z validované
+konfigurace; žádná uživatelská absolutní cesta není v kódu.
+
+## Scrape pipeline
+
+`sreality_tracker.scraper.source.SrealityListingSource` prochází všechny stránky
+obou potvrzených kategorií, páruje nabídky se skutečnými detail odkazy v HTML a
+načítá každý externí listing nejvýše jednou za kategorii. Orchestrace v
+`sreality_tracker.scraper.pipeline.ScrapePipeline` vytvoří auditní `scrape_run`
+a ukládá každý detail v jedné databázové transakci společně s aktuálním stavem,
+metadaty obrázků a pozorováním.
+
+`logical_key` běhu je unikátní. Opakované spuštění již dokončeného klíče vrátí
+existující výsledek bez síťových požadavků a bez duplicit. Kategorie se označí
+jako kompletní pouze po úplném průchodu jejího iterátoru; chyba se uloží jen jako
+bezpečný typ a výsledný běh je `partial` nebo `failed`. Události a hromadná
+deaktivace jsou záměrně až součástí M1-08 a M1-09.
+
+## Ruční CLI
+
+Po instalaci projektu lze bez zápisu a bez HTTP requestu ověřit konfiguraci a
+spojení s databází:
+
+```powershell
+sreality-scrape check
+```
+
+Ruční kompletní běh vyžaduje explicitní unikátní klíč. Jeho opakování je
+idempotentní a vrátí již uložený výsledek:
+
+```powershell
+sreality-scrape run --logical-key "manual:2026-08-11T1200"
+```
+
+CLI vypisuje jediný strojově čitelný JSON objekt a při chybě zveřejní pouze typ
+výjimky, nikoli credentials nebo obsah odpovědi. Lokální `run` používá
+`SREALITY_RAW_STORAGE_PATH`; produkční volba GCS adaptéru patří do cloudového
+wiringu.

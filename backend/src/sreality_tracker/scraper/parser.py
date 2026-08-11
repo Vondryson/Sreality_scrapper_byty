@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import json
+import re
 from copy import deepcopy
 from html.parser import HTMLParser
 from typing import Any
+from urllib.parse import urlsplit
 
 from sreality_tracker.domain.listings import (
     ImageMetadata,
@@ -50,10 +52,34 @@ class _NextDataParser(HTMLParser):
         return _required_mapping(value, "__NEXT_DATA__")
 
 
+class _DetailLinkParser(HTMLParser):
+    def __init__(self) -> None:
+        super().__init__(convert_charrefs=True)
+        self.paths: dict[int, str] = {}
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        if tag != "a":
+            return
+        href = dict(attrs).get("href")
+        if href is None:
+            return
+        path = urlsplit(href).path
+        match = re.fullmatch(r"(/detail/.*/([1-9][0-9]*))/?", path)
+        if match is not None:
+            self.paths.setdefault(int(match.group(2)), match.group(1))
+
+
 def parse_next_data_html(html: str) -> dict[str, Any]:
     parser = _NextDataParser()
     parser.feed(html)
     return parser.payload()
+
+
+def extract_detail_paths_html(html: str) -> dict[int, str]:
+    """Map external listing IDs to canonical detail paths found in search HTML."""
+    parser = _DetailLinkParser()
+    parser.feed(html)
+    return parser.paths
 
 
 def extract_query(
