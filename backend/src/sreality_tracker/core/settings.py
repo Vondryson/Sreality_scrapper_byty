@@ -50,6 +50,7 @@ class Settings(BaseSettings):
     google_oauth_redirect_uri: str = (
         "http://localhost:8000/api/v1/auth/google/callback"
     )
+    frontend_url: str = "http://localhost:3000"
     owner_email: str | None = None
     session_secret: SecretStr | None = None
 
@@ -83,6 +84,17 @@ class Settings(BaseSettings):
         if self.routes_access_token is None:
             return None
         return self.routes_access_token.get_secret_value()
+
+    @field_validator("frontend_url")
+    @classmethod
+    def validate_frontend_url(cls, value: str) -> str:
+        frontend = urlparse(value)
+        local_http = frontend.scheme == "http" and frontend.hostname == "localhost"
+        if frontend.scheme != "https" and not local_http:
+            raise ValueError("must use HTTPS or HTTP localhost")
+        if frontend.path not in {"", "/"} or frontend.params or frontend.query or frontend.fragment:
+            raise ValueError("must be an origin without a path")
+        return value.rstrip("/")
 
     @model_validator(mode="after")
     def validate_google_oauth(self) -> Settings:

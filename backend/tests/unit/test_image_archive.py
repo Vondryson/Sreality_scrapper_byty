@@ -48,3 +48,23 @@ def test_image_archive_key_rejects_invalid_identity() -> None:
         image_archive_key(listing_id=0, source_fingerprint="a" * 64)
     with pytest.raises(ValueError):
         image_archive_key(listing_id=1, source_fingerprint="../escape")
+
+
+def test_local_archive_loads_only_recognized_bitmap_content(tmp_path: Path) -> None:
+    storage = LocalImageArchiveStorage(tmp_path)
+    valid_key = image_archive_key(listing_id=1, source_fingerprint="b" * 64)
+    invalid_key = image_archive_key(listing_id=1, source_fingerprint="c" * 64)
+    storage.store(
+        key=valid_key,
+        image=FetchedImage(content=b"\xff\xd8\xffjpeg-data", content_type="image/jpeg"),
+    )
+    storage.store(
+        key=invalid_key,
+        image=FetchedImage(content=b"<svg onload='alert(1)'>", content_type="image/svg+xml"),
+    )
+
+    loaded = storage.load(key=valid_key)
+    assert loaded.content_type == "image/jpeg"
+    assert loaded.content.startswith(b"\xff\xd8\xff")
+    with pytest.raises(ImageArchiveError, match="invalid format"):
+        storage.load(key=invalid_key)

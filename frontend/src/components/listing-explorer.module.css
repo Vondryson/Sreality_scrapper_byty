@@ -1,0 +1,34 @@
+.stack { display: grid; gap: var(--space-6); }
+.kicker { margin: 0 0 var(--space-1); color: var(--color-accent); font-size: .74rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+.filters { background: var(--color-surface-raised); border: 1px solid var(--color-border); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); }
+.filters summary { display: flex; justify-content: space-between; padding: var(--space-4) var(--space-5); cursor: pointer; font-weight: 800; }
+.filters summary span { color: var(--color-text-muted); font-size: .8rem; font-weight: 600; }
+.filters form { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-4); padding: var(--space-5); border-top: 1px solid var(--color-border); }
+.filters label, .listingHeader label { display: grid; gap: var(--space-1); color: var(--color-text-muted); font-size: .75rem; font-weight: 700; }
+.filters input, .filters select, .listingHeader select { width: 100%; min-height: 2.65rem; padding: .55rem .65rem; color: var(--color-text); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-sm); }
+.filterActions { grid-column: 1 / -1; display: flex; align-items: center; gap: var(--space-4); padding-top: var(--space-2); }
+.filterActions button { padding: .75rem 1rem; color: white; background: var(--color-accent); border: 0; border-radius: var(--radius-sm); font-weight: 800; cursor: pointer; }
+.filterActions a { color: var(--color-accent); font-weight: 700; }
+.listingHeader { display: flex; align-items: end; justify-content: space-between; gap: var(--space-5); margin-top: var(--space-4); }
+.listingHeader h2 { margin: 0; font-size: clamp(1.7rem, 4vw, 2.4rem); }
+.listingHeader label { min-width: 14rem; }
+.results { display: grid; gap: var(--space-3); }
+.total { margin: 0; color: var(--color-text-muted); font-size: .85rem; }
+.tableWrap { overflow-x: auto; background: var(--color-surface-raised); border: 1px solid var(--color-border); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); }
+.tableWrap table { width: 100%; min-width: 63rem; border-collapse: collapse; }
+.tableWrap th { padding: var(--space-3) var(--space-4); color: var(--color-text-muted); background: var(--color-surface); text-align: left; font-size: .72rem; letter-spacing: .06em; text-transform: uppercase; }
+.tableWrap td { padding: var(--space-4); border-top: 1px solid var(--color-border); vertical-align: top; }
+.tableWrap td > * { display: block; }
+.tableWrap td a { color: var(--color-text); text-decoration-color: var(--color-accent); text-underline-offset: 3px; }
+.tableWrap td span { margin-top: .18rem; color: var(--color-text-muted); font-size: .78rem; }
+.tableWrap td .active, .tableWrap td .inactive, .tableWrap td .favorite { display: inline-flex; width: fit-content; padding: .22rem .48rem; border-radius: 999px; font-weight: 800; }
+.tableWrap td .active { color: var(--color-accent); background: var(--color-accent-soft); }
+.tableWrap td .inactive { color: var(--color-text-muted); background: var(--color-border); }
+.tableWrap td .favorite { color: #795500; background: #fff0bf; }
+.pagination { display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); padding-top: var(--space-3); }
+.pagination a { min-width: 6.5rem; padding: .6rem .8rem; color: var(--color-accent); background: var(--color-accent-soft); border-radius: var(--radius-sm); font-weight: 800; text-align: center; text-decoration: none; }
+.pagination a:last-child { margin-left: auto; }
+.pagination a[aria-disabled="true"] { pointer-events: none; opacity: .45; }
+.pagination span { color: var(--color-text-muted); font-size: .85rem; }
+@media (max-width: 58rem) { .filters form { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 34rem) { .filters form { grid-template-columns: 1fr; } .listingHeader { align-items: stretch; flex-direction: column; } .listingHeader label { min-width: 0; } .pagination span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); } }

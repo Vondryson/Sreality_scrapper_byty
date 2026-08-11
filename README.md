@@ -2,7 +2,7 @@
 
 Neveřejná aplikace pro dlouhodobou analýzu chat a chalup nabízených k prodeji na Sreality.cz. Produktový rozsah a cílovou architekturu určuje [specifikace](specifikace.md), pořadí práce [roadmapa](roadmap.md) a aktuální stav [progres](progres.md).
 
-Projekt je ve fázi M0 – ověření zdroje, dat a nákladů. Původní scraper z roku 2024 zůstává dočasně v kořenových souborech a adresářích jako referenční legacy implementace; nový produkční kód vzniká odděleně v `backend/`.
+Projekt je ve fázi M3 – český responzivní frontend. Původní scraper z roku 2024 zůstává dočasně v kořenových souborech a adresářích jako referenční legacy implementace; nový produkční kód vzniká odděleně v `backend/` a `frontend/`.
 
 ## Cílová struktura
 
@@ -45,7 +45,15 @@ Na Linuxu/macOS se aktivace liší:
 source .venv/bin/activate
 ```
 
-Frontend zatím nemá `package.json`; vznikne až v tasku `M3-01`, aby nebyl předčasně zvolen frameworkový scaffold bez stabilního API kontraktu.
+Frontend nainstalujete a spustíte samostatně:
+
+```powershell
+cd frontend
+npm install
+npm run dev
+```
+
+Lokálně používejte pro frontend i OAuth host `localhost`; nemíchejte jej s `127.0.0.1`, protože cookies jsou vázané na host.
 
 ## Kontroly kvality
 
@@ -54,6 +62,12 @@ python -m ruff check backend scripts
 python -m ruff format --check backend scripts
 python -m mypy
 python -m pytest
+cd frontend
+npm run lint
+npm run typecheck
+npm test
+npm run test:e2e
+npm run build
 ```
 
 Automatická oprava formátu:

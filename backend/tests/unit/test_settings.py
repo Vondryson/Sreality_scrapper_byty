@@ -55,6 +55,7 @@ def test_missing_database_url_fails_without_echoing_values(
         ("SREALITY_RAW_STORAGE_PATH", "C:/private/data", "relative path"),
         ("SREALITY_RAW_STORAGE_PATH", "../outside", "relative path"),
         ("SREALITY_ROUTES_DAILY_REQUEST_LIMIT", "301", "less than or equal to 300"),
+        ("SREALITY_FRONTEND_URL", "http://attacker.example/path", "HTTPS or HTTP localhost"),
     ],
 )
 def test_invalid_configuration_is_clear_and_redacted(

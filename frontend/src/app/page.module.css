@@ -1,0 +1,9 @@
+.stack { display: grid; gap: clamp(3rem, 8vw, 6rem); }
+.hero { max-width: 52rem; }
+.eyebrow { margin: 0 0 var(--space-3); color: var(--color-accent); font-size: .76rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+.hero h1 { max-width: 12ch; margin: 0; font-size: clamp(2.6rem, 8vw, 5.6rem); line-height: .98; letter-spacing: -.055em; }
+.lead { max-width: 43rem; margin: var(--space-6) 0 0; color: var(--color-text-muted); font-size: clamp(1rem, 2vw, 1.22rem); }
+.sectionHeading { display: flex; align-items: end; justify-content: space-between; gap: var(--space-4); margin-bottom: var(--space-5); }
+.sectionHeading h2 { margin: 0; font-size: clamp(1.5rem, 4vw, 2.2rem); letter-spacing: -.035em; }
+.pill { padding: .4rem .65rem; color: var(--color-accent); background: var(--color-accent-soft); border-radius: 999px; font-size: .75rem; font-weight: 800; white-space: nowrap; }
+@media (max-width: 34rem) { .sectionHeading { align-items: start; flex-direction: column; } }
