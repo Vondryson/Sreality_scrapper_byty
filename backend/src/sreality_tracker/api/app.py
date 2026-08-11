@@ -5,19 +5,24 @@ from __future__ import annotations
 from collections.abc import AsyncIterator, Callable
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI
 from sqlalchemy import Engine, text
 from sqlalchemy.exc import SQLAlchemyError
 
 from sreality_tracker import __version__
+from sreality_tracker.api.auth import AuthManager, GoogleOAuthClient, SessionCodec
+from sreality_tracker.api.auth_routes import router as auth_router
 from sreality_tracker.api.dependencies import AppContainer
 from sreality_tracker.api.errors import register_exception_handlers
 from sreality_tracker.api.listing_insights import router as listing_insights_router
 from sreality_tracker.api.listings import router as listings_router
+from sreality_tracker.api.operations import router as operations_router
+from sreality_tracker.api.owner import require_owner
 from sreality_tracker.api.system import router as system_router
 from sreality_tracker.api.user_listing_service import ImageArchiver
 from sreality_tracker.api.user_listings import router as user_listings_router
 from sreality_tracker.core.settings import Settings, load_settings
+from sreality_tracker.db.models import ScrapeRunTrigger
 from sreality_tracker.db.session import create_database_engine, create_session_factory
 from sreality_tracker.storage.images import HttpxImageFetcher, LocalImageArchiveStorage
 
@@ -30,6 +35,8 @@ def create_app(
     engine: Engine | None = None,
     readiness_probe: Callable[[], bool] | None = None,
     image_archiver: ImageArchiver | None = None,
+    auth_manager: AuthManager | None = None,
+    manual_scrape_trigger: Callable[[str], None] | None = None,
 ) -> FastAPI:
     resolved_settings = settings or load_settings()
     resolved_engine = engine or create_database_engine(resolved_settings.database_url_value())
@@ -42,6 +49,8 @@ def create_app(
         readiness_probe=probe,
         owns_engine=owns_engine,
         image_archiver=image_archiver or _local_image_archiver(resolved_settings),
+        auth_manager=auth_manager or _auth_manager(resolved_settings),
+        manual_scrape_trigger=manual_scrape_trigger or _local_manual_trigger(resolved_settings),
     )
 
     @asynccontextmanager
@@ -49,6 +58,8 @@ def create_app(
         try:
             yield
         finally:
+            if container.auth_manager is not None:
+                container.auth_manager.oauth_client.close()
             if container.owns_engine:
                 container.engine.dispose()
 
@@ -60,9 +71,20 @@ def create_app(
     app.state.container = container
     register_exception_handlers(app)
     app.include_router(system_router, prefix=API_V1_PREFIX)
-    app.include_router(listings_router, prefix=API_V1_PREFIX)
-    app.include_router(listing_insights_router, prefix=API_V1_PREFIX)
+    app.include_router(auth_router, prefix=API_V1_PREFIX)
+    owner_dependencies = [Depends(require_owner)]
+    app.include_router(
+        listings_router,
+        prefix=API_V1_PREFIX,
+        dependencies=owner_dependencies,
+    )
+    app.include_router(
+        listing_insights_router,
+        prefix=API_V1_PREFIX,
+        dependencies=owner_dependencies,
+    )
     app.include_router(user_listings_router, prefix=API_V1_PREFIX)
+    app.include_router(operations_router, prefix=API_V1_PREFIX)
     return app
 
 
@@ -83,3 +105,33 @@ def _local_image_archiver(settings: Settings) -> ImageArchiver:
         fetcher=HttpxImageFetcher(timeout_seconds=settings.http_timeout_seconds),
         storage=LocalImageArchiveStorage(settings.raw_storage_path / "images"),
     )
+
+
+def _auth_manager(settings: Settings) -> AuthManager | None:
+    if (
+        settings.google_oauth_client_id is None
+        or settings.google_oauth_client_secret is None
+        or settings.owner_email is None
+        or settings.session_secret is None
+    ):
+        return None
+    return AuthManager(
+        client_id=settings.google_oauth_client_id,
+        client_secret=settings.google_oauth_client_secret.get_secret_value(),
+        redirect_uri=settings.google_oauth_redirect_uri,
+        owner_email=settings.owner_email,
+        codec=SessionCodec(settings.session_secret.get_secret_value()),
+        oauth_client=GoogleOAuthClient(),
+    )
+
+
+def _local_manual_trigger(settings: Settings) -> Callable[[str], None] | None:
+    if settings.environment.value == "production":
+        return None
+
+    def trigger(logical_key: str) -> None:
+        from sreality_tracker.scraper.cli import _run_pipeline
+
+        _run_pipeline(settings, logical_key=logical_key, trigger=ScrapeRunTrigger.MANUAL)
+
+    return trigger

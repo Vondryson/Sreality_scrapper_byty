@@ -13,6 +13,7 @@ from sqlalchemy.orm import Session, sessionmaker
 from sreality_tracker.core.settings import Settings
 
 if False:  # pragma: no cover - imported only for static typing without a runtime cycle
+    from sreality_tracker.api.auth import AuthManager
     from sreality_tracker.api.user_listing_service import ImageArchiver
 
 
@@ -24,6 +25,8 @@ class AppContainer:
     readiness_probe: Callable[[], bool]
     owns_engine: bool
     image_archiver: ImageArchiver | None
+    auth_manager: AuthManager | None
+    manual_scrape_trigger: Callable[[str], None] | None
 
 
 def get_container(request: Request) -> AppContainer:
@@ -45,3 +48,4 @@ def get_readiness_probe(
 
 
 DatabaseSession = Annotated[Session, Depends(get_session)]
+ApplicationContainer = Annotated[AppContainer, Depends(get_container)]

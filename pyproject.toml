@@ -11,10 +11,12 @@ requires-python = ">=3.13,<3.14"
 dependencies = [
     "alembic>=1.16,<2",
     "fastapi>=0.139,<0.140",
+    "google-auth>=2.40,<3",
     "google-cloud-storage>=3.2,<4",
     "httpx>=0.28,<1",
     "psycopg[binary]>=3.2,<4",
     "pydantic-settings>=2.10,<3",
+    "requests>=2.32,<3",
     "sqlalchemy>=2.0,<3",
     "truststore>=0.10,<1",
     "uvicorn>=0.51,<0.52",

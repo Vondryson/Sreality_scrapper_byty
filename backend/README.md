@@ -170,6 +170,31 @@ Backfill nikdy nepřijme limit vyšší než 300 a klient má samostatný proces
 budget. Projektová denní consumer quota 300 zůstává hlavní tvrdou pojistkou.
 Výstup CLI obsahuje `provider_requests`, `cache_hits`, `created` a `failed`.
 
+## Google OAuth a soukromé API
+
+Všechna data nabídek, analytika, mapa, uživatelská data a provozní endpointy
+vyžadují owner session. Veřejné zůstávají pouze health/readiness, OpenAPI a
+OAuth entry/callback. Login začíná na:
+
+```text
+GET /api/v1/auth/google/login
+```
+
+Backend používá authorization-code flow se state, nonce a PKCE, ověřuje Google
+ID token a přesný `SREALITY_OWNER_EMAIL`. Osmihodinová session cookie je
+`HttpOnly`, `Secure`, `SameSite=Lax`; zápisové requesty musí poslat CSRF token
+z `GET /api/v1/auth/session` v hlavičce `X-CSRF-Token`.
+
+Owner-only provozní API:
+
+- `GET /api/v1/operations/scrape-runs/latest`,
+- `POST /api/v1/operations/scrape-runs` s unikátním `logical_key`.
+
+Ruční trigger nejprve rezervuje unikátní `manual:` run a práci spouští po
+odpovědi. Opakování stejného klíče vrátí stejné run ID. Lokální server načte
+ignorovaný `.env` například přes `uvicorn --env-file .env`; secrets se nikdy
+nepřidávají do `.env.example` ani do Gitu.
+
 ## FastAPI
 
 Aplikační factory je `sreality_tracker.api.create_app`; načtení modulu samo o

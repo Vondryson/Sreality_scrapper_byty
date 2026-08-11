@@ -4,10 +4,10 @@
 
 - Poslední aktualizace: 2026-08-11
 - Aktuální milník: M2 – Vzdálenosti, FastAPI a zabezpečené operace (cloudová brána `M0-05` zůstává blokovaná)
-- Aktuální hlavní task: `M2-08` – Implementovat Google OAuth, allowlist a provozní endpointy
-- Následující doporučený task: `M3-01` – Založit Next.js frontend a UI základ
+- Aktuální hlavní task: `M3-01` – Založit Next.js frontend a UI základ
+- Následující doporučený task: `M3-02` – Implementovat přihlášení a chráněný shell
 - Blokátory: celková nákladová brána M0-05 zůstává otevřená do uzavření kompletního GCP rozpočtu; lokální implementaci M2 neblokuje
-- Souhrn: 22 dokončeno, 1 rozpracováno, 1 blokováno, 19 čeká
+- Souhrn: 23 dokončeno, 1 rozpracováno, 1 blokováno, 18 čeká
 
 ## Legenda
 
@@ -52,11 +52,11 @@ Najednou má být `[~]` označen nejvýše jeden hlavní task. Dílčí paraleln
 - [x] `M2-05` – Implementovat seznam, filtry, řazení a stránkování.
 - [x] `M2-06` – Implementovat detail, historii, mapu a medián.
 - [x] `M2-07` – Implementovat oblíbené, poznámky a archivaci fotografií.
-- [~] `M2-08` – Implementovat Google OAuth, allowlist a provozní endpointy.
+- [x] `M2-08` – Implementovat Google OAuth, allowlist a provozní endpointy.
 
 ## M3 – Český responzivní frontend
 
-- [ ] `M3-01` – Založit Next.js frontend a UI základ.
+- [~] `M3-01` – Založit Next.js frontend a UI základ.
 - [ ] `M3-02` – Implementovat přihlášení a chráněný shell.
 - [ ] `M3-03` – Implementovat dashboard mediánu.
 - [ ] `M3-04` – Implementovat tabulku nabídek a URL filtry.
@@ -84,14 +84,14 @@ Najednou má být `[~]` označen nejvýše jeden hlavní task. Dílčí paraleln
 
 ## Pracovní poznámky k aktivnímu tasku
 
-### 2026-08-11 – `M2-08`
+### 2026-08-11 – `M3-01`
 
-- Plán: napojit owner dependency na ověřenou Google identitu a allowlist, přidat bezpečnou session a chráněný stav/ruční spuštění scraperu.
-- Rozsah: auth konfigurace, OAuth/session adaptéry, middleware/dependencies, provozní kontrakty a testy zákazu přístupu.
-- Rizika: tokeny a OAuth chyby nesmějí unikat do logů/odpovědí; ruční spuštění musí mít idempotency ochranu a nesmí blokovat request proces.
-- Předpoklady: live OAuth client credential a redirect URI budou konfigurované v osobním projektu; lokální kryptografické a autorizační chování lze dokončit bez nich.
-- Provedené testy: M2-03 prošel plnou sadou 102 passed, 2 explicitní live skipped; 42 backend source souborů prošlo strict mypy a dotčené soubory Ruff.
-- Zbývá: implementovat auth/session a provozní endpointy, integračně ověřit allowlist, CSRF/session vlastnosti a manuální trigger.
+- Plán: založit Next.js frontend, typovaný API klient, české formátování, design tokeny a sdílené loading/empty/error stavy.
+- Rozsah: frontend workspace, build/lint/test konfigurace, layout, API kontrakty a základní responzivní komponenty.
+- Rizika: frontend musí posílat cookies a CSRF pouze na stejný důvěryhodný backend; nesmí duplikovat serverovou autorizační logiku.
+- Předpoklady: stabilní M2 API a live ověřený OAuth callback jsou připravené; lokální frontend bude používat backend na `127.0.0.1:8000`.
+- Provedené testy: M2-08 prošel plnou sadou 108 passed, 2 explicitní live skipped a ručním Google OAuth loginem s `authenticated: true`.
+- Zbývá: založit frontend toolchain a ověřit první lokální build/test.
 
 Při zahájení tasku sem zapsat:
 
@@ -122,6 +122,16 @@ Položka označená `[!]` musí zde uvést:
 - které další tasky blokuje.
 
 ## Historie dokončené práce
+
+### 2026-08-11 – `M2-08`
+
+- Přidán Google authorization-code flow se state, nonce, PKCE a serverovým ověřením ID tokenu; backend vyžaduje ověřený e-mail a přesný owner allowlist.
+- Osmihodinová HMAC session používá `HttpOnly`, `Secure`, `SameSite=Lax`; pozměněná, expirovaná nebo cizí session je odmítnuta.
+- Všechny listing, detail, mapové, analytické a provozní endpointy jsou soukromé; zápisové operace navíc vyžadují shodný CSRF token.
+- Přidán owner-only stav posledního scraper běhu a idempotentní manuální trigger, který rezervuje unikátní run a práci spouští po HTTP odpovědi.
+- OAuth, owner a session secrets jsou validované/redigované a zůstávají pouze v ignorovaném `.env`; neúplná konfigurace nebo session secret kratší než 32 bajtů bezpečně selže.
+- Live login přes osobní projekt a účet vrátil `authenticated: true`; sanitizovaný důkaz je v `docs/discovery/m2-08-google-oauth-validation.md`.
+- Ověření: 108 passed, 2 explicitní live skipped; Ruff, strict mypy pro 45 source souborů a `git diff --check` čisté.
 
 ### 2026-08-11 – `M2-03`
 

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import json
 import os
 from collections.abc import Iterator
@@ -13,9 +14,11 @@ import httpx
 import pytest
 from alembic import command
 from alembic.config import Config
+from pydantic import SecretStr
 from sqlalchemy import func, select, text
 from sqlalchemy.engine import make_url
 
+from sreality_tracker.api.app import create_app
 from sreality_tracker.api.listing_contracts import (
     ListingFilters,
     ListingSort,
@@ -30,6 +33,7 @@ from sreality_tracker.api.listing_insight_repository import (
 from sreality_tracker.api.listing_repository import list_listings
 from sreality_tracker.api.user_listing_contracts import UserListingUpdate
 from sreality_tracker.api.user_listing_service import ImageArchiver, update_user_listing
+from sreality_tracker.core.settings import Environment, Settings
 from sreality_tracker.db.models import (
     Listing,
     ListingDistance,
@@ -428,6 +432,96 @@ def test_pipeline_caches_routes_and_provider_failure_never_blocks_listing(tmp_pa
             )
         )
         assert failed_route is None
+
+    engine.dispose()
+
+
+@pytest.mark.integration
+def test_owner_only_operations_are_csrf_protected_and_idempotent() -> None:
+    database_url = os.getenv("SREALITY_TEST_DATABASE_URL")
+    if database_url is None:
+        pytest.skip("SREALITY_TEST_DATABASE_URL is not configured")
+    assert make_url(database_url).database == "sreality_tracker_test"
+    command.upgrade(migration_config(database_url), "head")
+
+    engine = create_database_engine(database_url)
+    with engine.begin() as connection:
+        connection.execute(
+            text(
+                "TRUNCATE listing_distances, user_listing_data, listing_events, "
+                "listing_images, listing_observations, listings, scrape_runs "
+                "RESTART IDENTITY CASCADE"
+            )
+        )
+    triggered: list[str] = []
+    settings = Settings(
+        database_url=SecretStr(database_url),
+        environment=Environment.TEST,
+        google_oauth_client_id="test-client.apps.googleusercontent.com",
+        google_oauth_client_secret=SecretStr("oauth-secret"),
+        owner_email="owner@example.com",
+        session_secret=SecretStr("s" * 32),
+    )
+    app = create_app(
+        settings=settings,
+        engine=engine,
+        manual_scrape_trigger=triggered.append,
+    )
+    manager = app.state.container.auth_manager
+    assert manager is not None
+    csrf = "integration-csrf"
+    session_cookie = manager.codec.dumps(
+        {
+            "purpose": "owner_session",
+            "sub": "owner-subject",
+            "email": "owner@example.com",
+            "csrf": csrf,
+            "exp": int(datetime.now(UTC).timestamp()) + 300,
+        }
+    )
+    auth_headers = {
+        "Cookie": f"sreality_session={session_cookie}",
+        "X-CSRF-Token": csrf,
+    }
+
+    async def exercise_api() -> tuple[httpx.Response, ...]:
+        transport = httpx.ASGITransport(app=app, raise_app_exceptions=False)
+        async with httpx.AsyncClient(transport=transport, base_url="https://test") as client:
+            denied = await client.post(
+                "/api/v1/operations/scrape-runs",
+                json={"logical_key": "ui-test"},
+            )
+            csrf_denied = await client.post(
+                "/api/v1/operations/scrape-runs",
+                json={"logical_key": "ui-test"},
+                headers={"Cookie": f"sreality_session={session_cookie}"},
+            )
+            first = await client.post(
+                "/api/v1/operations/scrape-runs",
+                json={"logical_key": "ui-test"},
+                headers=auth_headers,
+            )
+            repeated = await client.post(
+                "/api/v1/operations/scrape-runs",
+                json={"logical_key": "ui-test"},
+                headers=auth_headers,
+            )
+            latest = await client.get(
+                "/api/v1/operations/scrape-runs/latest",
+                headers=auth_headers,
+            )
+        return denied, csrf_denied, first, repeated, latest
+
+    denied, csrf_denied, first, repeated, latest = asyncio.run(exercise_api())
+    assert denied.status_code == 401
+    assert csrf_denied.status_code == 403
+    assert first.status_code == 202
+    assert repeated.status_code == 202
+    assert first.json()["run_id"] == repeated.json()["run_id"]
+    assert first.json()["logical_key"] == "manual:ui-test"
+    assert latest.status_code == 200
+    assert latest.json()["run_id"] == first.json()["run_id"]
+    assert triggered == ["manual:ui-test"]
 
     engine.dispose()
 
