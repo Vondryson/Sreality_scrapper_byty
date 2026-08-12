@@ -183,6 +183,32 @@ def test_seznam_autologin_redirect_is_rejected_before_second_request() -> None:
     assert len(requests) == 1
 
 
+def test_rejected_redirect_clears_cookies_before_next_search() -> None:
+    fake_time = FakeTime()
+    requests: list[httpx.Request] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        requests.append(request)
+        if request.url.path.startswith("/detail/"):
+            return httpx.Response(
+                302,
+                headers={
+                    "location": "https://login.seznam.cz/api/v1/autologin",
+                    "set-cookie": "consent_redirect=1; Path=/; Secure",
+                },
+                request=request,
+            )
+        return html_response(request)
+
+    with make_client(handler, fake_time) as client:
+        with pytest.raises(ResponseValidationError, match="outside"):
+            client.fetch_detail_page("/detail/prodej/dum/chata/example/123")
+        client.fetch_search_page(ListingKind.CHATA, page=2)
+
+    assert len(requests) == 2
+    assert "consent_redirect" not in requests[1].headers.get("cookie", "")
+
+
 def test_detail_path_cannot_target_another_host() -> None:
     fake_time = FakeTime()
     with (

@@ -116,6 +116,13 @@ Položka označená `[!]` musí zde uvést:
 
 ## Historie dokončené práce
 
+### 2026-08-11 – oprava živého scraperu po změně detailního SSR
+
+- Živě ověřeno, že search SSR pro chaty i chalupy zůstává funkční, ale detail inzerátu nově přesměrovává přes consent flow Seznamu a bezpečnostní validace klienta jej správně odmítne.
+- Zdroj po prvním nedostupném detailu přejde pro zbytek kategorie na omezená data ze search payloadu; zachová ID, název, cenu, lokalitu, GPS a obrázky a neprovádí tisíce dalších chybných detail requestů. Popis, plochy a detailní parametry zůstávají v tomto režimu prázdné.
+- Odmítnutý cross-host consent/autologin redirect zároveň vyčistí cookies, které by jinak kontaminovaly sdílenou HTTP session a odklonily i následující search stránky.
+- Ověření: živý smoke test přes dvě search stránky prošel; 105 unit testů, Ruff a cílený mypy check prošly. Plný mypy nad repozitářem nadále hlásí pět dříve existujících chyb ve třech M0 skriptech.
+
 ### 2026-08-11 – `M3-08`
 
 - Doplněn skip link, viditelné focus stavy, reduced-motion režim a responzivní layouty tabulky, mapy, galerie, detailu i soukromých ovládacích prvků.
