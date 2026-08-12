@@ -38,12 +38,19 @@ class ArchivedImage:
     size: int
 
 
+@dataclass(frozen=True, slots=True)
+class ArchivedImageContent:
+    content: bytes
+    content_type: str
+
+
 class ImageFetcher(Protocol):
     def fetch(self, source_url: str) -> FetchedImage: ...
 
 
 class ImageArchiveStorage(Protocol):
     def store(self, *, key: str, image: FetchedImage) -> ArchivedImage: ...
+    def load(self, *, key: str) -> ArchivedImageContent: ...
 
 
 class HttpxImageFetcher:
@@ -117,6 +124,19 @@ class LocalImageArchiveStorage:
                 temporary_path.unlink(missing_ok=True)
         return result
 
+    def load(self, *, key: str) -> ArchivedImageContent:
+        target = self._safe_path(key)
+        try:
+            content = target.read_bytes()
+        except (FileNotFoundError, OSError) as error:
+            raise ImageArchiveError("archived image is unavailable") from error
+        if len(content) > MAX_IMAGE_BYTES:
+            raise ImageArchiveError("archived image exceeds the size limit")
+        content_type = _bitmap_content_type(content)
+        if content_type is None:
+            raise ImageArchiveError("archived image has an invalid format")
+        return ArchivedImageContent(content=content, content_type=content_type)
+
     def _safe_path(self, key: str) -> Path:
         path = PurePosixPath(key)
         if (
@@ -146,3 +166,15 @@ def _is_allowed_source(scheme: str, hostname: str | None) -> bool:
         return False
     normalized = hostname.rstrip(".").lower()
     return any(normalized.endswith(suffix) for suffix in ALLOWED_IMAGE_HOST_SUFFIXES)
+
+
+def _bitmap_content_type(content: bytes) -> str | None:
+    if content.startswith(b"\xff\xd8\xff"):
+        return "image/jpeg"
+    if content.startswith(b"\x89PNG\r\n\x1a\n"):
+        return "image/png"
+    if content.startswith((b"GIF87a", b"GIF89a")):
+        return "image/gif"
+    if len(content) >= 12 and content.startswith(b"RIFF") and content[8:12] == b"WEBP":
+        return "image/webp"
+    return None

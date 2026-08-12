@@ -3,11 +3,11 @@
 ## Aktuální stav
 
 - Poslední aktualizace: 2026-08-11
-- Aktuální milník: M2 – Vzdálenosti, FastAPI a zabezpečené operace (cloudová brána `M0-05` zůstává blokovaná)
-- Aktuální hlavní task: `M3-01` – Založit Next.js frontend a UI základ
-- Následující doporučený task: `M3-02` – Implementovat přihlášení a chráněný shell
+- Aktuální milník: M3 – Český responzivní frontend (cloudová brána `M0-05` zůstává blokovaná)
+- Aktuální hlavní task: žádný – brána M3 je dokončena
+- Následující doporučený task: `M4-01` – Připravit produkční Docker images
 - Blokátory: celková nákladová brána M0-05 zůstává otevřená do uzavření kompletního GCP rozpočtu; lokální implementaci M2 neblokuje
-- Souhrn: 23 dokončeno, 1 rozpracováno, 1 blokováno, 18 čeká
+- Souhrn: 31 dokončeno, 0 rozpracováno, 1 blokováno, 11 čeká
 
 ## Legenda
 
@@ -56,14 +56,14 @@ Najednou má být `[~]` označen nejvýše jeden hlavní task. Dílčí paraleln
 
 ## M3 – Český responzivní frontend
 
-- [~] `M3-01` – Založit Next.js frontend a UI základ.
-- [ ] `M3-02` – Implementovat přihlášení a chráněný shell.
-- [ ] `M3-03` – Implementovat dashboard mediánu.
-- [ ] `M3-04` – Implementovat tabulku nabídek a URL filtry.
-- [ ] `M3-05` – Implementovat mapu.
-- [ ] `M3-06` – Implementovat detail a historii ceny.
-- [ ] `M3-07` – Implementovat oblíbené a soukromé poznámky.
-- [ ] `M3-08` – Dokončit responzivitu, přístupnost a E2E testy.
+- [x] `M3-01` – Založit Next.js frontend a UI základ.
+- [x] `M3-02` – Implementovat přihlášení a chráněný shell.
+- [x] `M3-03` – Implementovat dashboard mediánu.
+- [x] `M3-04` – Implementovat tabulku nabídek a URL filtry.
+- [x] `M3-05` – Implementovat mapu.
+- [x] `M3-06` – Implementovat detail a historii ceny.
+- [x] `M3-07` – Implementovat oblíbené a soukromé poznámky.
+- [x] `M3-08` – Dokončit responzivitu, přístupnost a E2E testy.
 
 ## M4 – GCP infrastruktura a automatizovaný provoz
 
@@ -84,14 +84,7 @@ Najednou má být `[~]` označen nejvýše jeden hlavní task. Dílčí paraleln
 
 ## Pracovní poznámky k aktivnímu tasku
 
-### 2026-08-11 – `M3-01`
-
-- Plán: založit Next.js frontend, typovaný API klient, české formátování, design tokeny a sdílené loading/empty/error stavy.
-- Rozsah: frontend workspace, build/lint/test konfigurace, layout, API kontrakty a základní responzivní komponenty.
-- Rizika: frontend musí posílat cookies a CSRF pouze na stejný důvěryhodný backend; nesmí duplikovat serverovou autorizační logiku.
-- Předpoklady: stabilní M2 API a live ověřený OAuth callback jsou připravené; lokální frontend bude používat backend na `127.0.0.1:8000`.
-- Provedené testy: M2-08 prošel plnou sadou 108 passed, 2 explicitní live skipped a ručním Google OAuth loginem s `authenticated: true`.
-- Zbývá: založit frontend toolchain a ověřit první lokální build/test.
+Žádný aktivní task. Další práce začne taskem `M4-01` po kontrole této M3 sady změn.
 
 Při zahájení tasku sem zapsat:
 
@@ -122,6 +115,63 @@ Položka označená `[!]` musí zde uvést:
 - které další tasky blokuje.
 
 ## Historie dokončené práce
+
+### 2026-08-11 – oprava živého scraperu po změně detailního SSR
+
+- Živě ověřeno, že search SSR pro chaty i chalupy zůstává funkční, ale detail inzerátu nově přesměrovává přes consent flow Seznamu a bezpečnostní validace klienta jej správně odmítne.
+- Zdroj po prvním nedostupném detailu přejde pro zbytek kategorie na omezená data ze search payloadu; zachová ID, název, cenu, lokalitu, GPS a obrázky a neprovádí tisíce dalších chybných detail requestů. Popis, plochy a detailní parametry zůstávají v tomto režimu prázdné.
+- Odmítnutý cross-host consent/autologin redirect zároveň vyčistí cookies, které by jinak kontaminovaly sdílenou HTTP session a odklonily i následující search stránky.
+- Ověření: živý smoke test přes dvě search stránky prošel; 105 unit testů, Ruff a cílený mypy check prošly. Plný mypy nad repozitářem nadále hlásí pět dříve existujících chyb ve třech M0 skriptech.
+
+### 2026-08-11 – `M3-08`
+
+- Doplněn skip link, viditelné focus stavy, reduced-motion režim a responzivní layouty tabulky, mapy, galerie, detailu i soukromých ovládacích prvků.
+- Playwright testuje owner cestu, URL filtry, detail, CSRF oblíbení, nepřihlášený shell a klávesnicovou navigaci v desktopovém Chromiu i Pixel 7 viewportu.
+- Ověření: 6/6 E2E scénářů prošlo; browser skill neměl v relaci připojený interaktivní browser, rendery byly vizuálně zkontrolovány z Playwright screenshotů.
+
+### 2026-08-11 – `M3-07`
+
+- Detail ukládá oblíbený stav a soukromou poznámku s jasným průběhem, chybou a potvrzením počtu archivovaných fotografií.
+- Archivované bitmapy vydává nový owner-only endpoint; key se bere pouze z DB, cesta zůstává pod storage rootem a odpověď používá validovaný magic header, private cache a `nosniff`.
+- Ověření: CSRF frontend test, owner/API test a storage test odmítající nebitmapový obsah; backend 103 passed, 11 environment/live skipped.
+
+### 2026-08-11 – `M3-06`
+
+- Responzivní detail zobrazuje bezpečně escapovaný popis, parametry, plochy, vzdálenosti, stav, zdrojový odkaz, galerii, cenovou historii a události.
+- Zdrojové obrázky i odkazy procházejí explicitním HTTPS host allowlistem; test ověřuje, že text obsahující `<script>` nevytvoří spustitelný element.
+- Ověření: frontend lint, strict typecheck, unit testy a produkční build s dynamickou routou `/nabidky/[id]` prošly.
+
+### 2026-08-11 – `M3-05`
+
+- Leaflet mapa sdílí URL filtry s tabulkou a mediánem, automaticky přizpůsobuje výřez a uvádí počet bodů i výsledků bez GPS.
+- Tile provider je bezpečně konfigurovatelný přes preset OSM/CARTO s pevnou správnou atribucí; libovolná URL se nepřijímá.
+- Ověření: konfigurační testy, lint, strict typecheck a produkční build prošly.
+
+### 2026-08-11 – `M3-04`
+
+- Tabulka podporuje všechny M2 filtry, whitelistované řazení a serverové stránkování; stav se serializuje do obnovitelné URL.
+- Nevalidní nebo neznámé query hodnoty bezpečně přecházejí na výchozí filtry a analytika/mapa používají stejný výběr bez prezentačního stránkování.
+- Ověření: parser round-trip/invalid input testy, frontend lint, strict typecheck a produkční build prošly.
+
+### 2026-08-11 – `M3-03`
+
+- Dashboard zobrazuje aktuální medián nabídkových cen, velikost filtrovaného vzorku a přístupný SVG vývoj po úspěšných bězích.
+- Jasné vysvětlení odděluje nabídkové ceny od skutečných realizovaných cen; dostupné jsou loading, empty, error a retry stavy.
+- Ověření: frontend lint, strict typecheck, 14 testů a produkční Next.js build prošly.
+
+### 2026-08-11 – `M3-02`
+
+- Frontend obnovuje owner session pouze přes HttpOnly cookie, drží CSRF token v paměti a bez autorizace nevyrenderuje chráněný obsah.
+- Google callback nastaví Secure session a vrací uživatele na pevně validovaný frontend origin; host je lokálně sjednocený na `localhost`.
+- Logout používá CSRF hlavičku; frontend automaticky znovu ověří session při návratu na viditelnou kartu.
+- Ověření: frontendové auth testy a backend callback/session test; backend 101 passed, 11 environment/live skipped.
+
+### 2026-08-11 – `M3-01`
+
+- Založen Next.js 16 App Router, React 19, strict TypeScript 6, ESLint 9, Vitest a reprodukovatelný npm lockfile.
+- Přidán typovaný klient celého M2 API se same-origin proxy, české formátování a společné loading/empty/error stavy.
+- Responzivní layout používá centrální design tokeny, viditelné focus stavy a respektuje reduced motion.
+- Ověření: lint, strict typecheck, unit testy a produkční build prošly.
 
 ### 2026-08-11 – `M2-08`
 

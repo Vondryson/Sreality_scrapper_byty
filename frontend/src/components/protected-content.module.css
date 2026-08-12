@@ -1,0 +1,6 @@
+.login { max-width: 38rem; margin: clamp(1rem, 8vh, 6rem) auto; padding: clamp(1.5rem, 5vw, 3.5rem); background: var(--color-surface-raised); border: 1px solid var(--color-border); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); text-align: center; }
+.login h1 { margin: 0; font-size: clamp(2rem, 6vw, 3.4rem); line-height: 1.05; letter-spacing: -.045em; }
+.login p:not(.eyebrow) { margin: var(--space-5) auto; max-width: 31rem; color: var(--color-text-muted); }
+.eyebrow { margin: 0 0 var(--space-4); color: var(--color-accent); font-size: .76rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+.loginButton { display: inline-flex; justify-content: center; padding: .85rem 1.2rem; color: white; background: var(--color-accent); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); font-weight: 800; text-decoration: none; }
+.loginButton:hover { background: var(--color-accent-hover); }

@@ -45,18 +45,18 @@ def google_login(request: Request) -> RedirectResponse:
     return response
 
 
-@router.get("/google/callback", response_model=AuthSessionResponse)
+@router.get("/google/callback", response_model=None)
 def google_callback(
     request: Request,
     code: str = Query(min_length=1),
     state: str = Query(min_length=1),
-) -> JSONResponse:
+) -> RedirectResponse:
     manager = _manager(request)
     flow_cookie = request.cookies.get(OAUTH_FLOW_COOKIE)
     if flow_cookie is None:
         raise ApiError(status_code=401, code="oauth_flow_invalid", message="Sign-in failed")
     try:
-        session_cookie, csrf_token = manager.complete_login(
+        session_cookie, _csrf_token = manager.complete_login(
             code=code,
             state=state,
             flow_cookie=flow_cookie,
@@ -70,12 +70,10 @@ def google_callback(
         ) from error
     if identity is None:
         raise ApiError(status_code=401, code="oauth_flow_invalid", message="Sign-in failed")
-    payload = AuthSessionResponse(
-        authenticated=True,
-        email=identity.email,
-        csrf_token=csrf_token,
+    response = RedirectResponse(
+        request.app.state.container.settings.frontend_url,
+        status_code=303,
     )
-    response = JSONResponse(payload.model_dump(mode="json"))
     response.set_cookie(
         SESSION_COOKIE,
         session_cookie,

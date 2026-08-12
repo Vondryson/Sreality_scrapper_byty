@@ -150,6 +150,10 @@ class SrealityClient:
                 raise ResponseValidationError("redirect response has no Location header")
             target = httpx.URL(urljoin(str(response.url), location))
             if target.scheme != "https" or target.host not in ALLOWED_REDIRECT_HOSTS:
+                # A rejected consent/autologin redirect can set cookies that make
+                # otherwise valid search pages redirect as well. Keep the safe
+                # host boundary and discard that contaminated session state.
+                self._client.cookies.clear()
                 raise ResponseValidationError(
                     "response attempted to redirect outside the allowed HTTPS hosts"
                 )

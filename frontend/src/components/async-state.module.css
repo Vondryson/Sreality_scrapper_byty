@@ -1,0 +1,21 @@
+.state {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  min-height: 9rem;
+  padding: var(--space-6);
+  color: var(--color-text-muted);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+}
+.state h2 { margin: 0 0 var(--space-1); color: var(--color-text); font-size: 1rem; }
+.state p { margin: 0; }
+.icon { display: grid; place-items: center; flex: 0 0 2.5rem; height: 2.5rem; border-radius: 50%; background: var(--color-accent-soft); color: var(--color-accent); font-weight: 800; }
+.error { border-color: var(--color-danger-border); }
+.error .icon { color: var(--color-danger); background: var(--color-danger-soft); }
+.spinner { width: 2rem; height: 2rem; flex: 0 0 2rem; border: 3px solid var(--color-accent-soft); border-top-color: var(--color-accent); border-radius: 50%; animation: spin .8s linear infinite; }
+.button { margin-top: var(--space-3); padding: .6rem .9rem; border: 0; border-radius: var(--radius-sm); color: white; background: var(--color-accent); font: inherit; font-weight: 700; cursor: pointer; }
+.button:focus-visible { outline: 3px solid var(--color-focus); outline-offset: 2px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .spinner { animation: none; } }

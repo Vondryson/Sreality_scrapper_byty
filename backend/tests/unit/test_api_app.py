@@ -2,7 +2,8 @@ from __future__ import annotations
 
 import asyncio
 import time
-from typing import Annotated
+from typing import Annotated, cast
+from unittest.mock import Mock
 
 import httpx
 from fastapi import Depends, FastAPI
@@ -12,8 +13,11 @@ from sqlalchemy.orm import Session
 from sqlalchemy.pool import StaticPool
 
 from sreality_tracker.api.app import create_app
+from sreality_tracker.api.auth import AuthManager, GoogleOAuthClient, SessionCodec
 from sreality_tracker.api.dependencies import get_session
+from sreality_tracker.api.user_listing_service import ImageArchiver
 from sreality_tracker.core.settings import Environment, Settings
+from sreality_tracker.storage.images import ArchivedImageContent, ImageArchiveStorage, ImageFetcher
 
 
 def build_test_settings() -> Settings:
@@ -183,6 +187,10 @@ def test_owner_session_and_csrf_are_enforced() -> None:
         )
     )
     assert denied.status_code == 401
+    [image_denied] = asyncio.run(
+        request_many(app, "/api/v1/listings/1/images/0/archive")
+    )
+    assert image_denied.status_code == 401
     assert valid.status_code == 200
     assert valid.json()["email"] == "owner@example.com"
 
@@ -197,4 +205,86 @@ def test_owner_session_and_csrf_are_enforced() -> None:
     assert csrf_failure.json()["error"]["code"] == "csrf_failed"
     assert success.status_code == 200
     assert success.json() == {"authenticated": False}
+    engine.dispose()
+
+
+def test_oauth_callback_sets_session_and_returns_to_fixed_frontend() -> None:
+    engine = create_engine("sqlite+pysqlite:///:memory:")
+    oauth_client = Mock(spec=GoogleOAuthClient)
+    manager = AuthManager(
+        client_id="test-client.apps.googleusercontent.com",
+        client_secret="oauth-secret",
+        redirect_uri="http://localhost:8000/api/v1/auth/google/callback",
+        owner_email="owner@example.com",
+        codec=SessionCodec("s" * 32),
+        oauth_client=cast(GoogleOAuthClient, oauth_client),
+    )
+    flow = manager.begin_login()
+    flow_payload = manager.codec.loads(flow.cookie_value, purpose="oauth_flow")
+    oauth_client.exchange_code.return_value = {
+        "nonce": flow_payload["nonce"],
+        "email": "owner@example.com",
+        "email_verified": True,
+        "sub": "owner-subject",
+    }
+    app = create_app(settings=build_test_settings(), engine=engine, auth_manager=manager)
+
+    async def callback() -> httpx.Response:
+        transport = httpx.ASGITransport(app=app, raise_app_exceptions=False)
+        async with httpx.AsyncClient(
+            transport=transport,
+            base_url="http://localhost:8000",
+            cookies={"sreality_oauth_flow": flow.cookie_value},
+        ) as client:
+            return await client.get(
+                "/api/v1/auth/google/callback",
+                params={"code": "one-time-code", "state": flow_payload["state"]},
+                follow_redirects=False,
+            )
+
+    response = asyncio.run(callback())
+    assert response.status_code == 303
+    assert response.headers["location"] == "http://localhost:3000"
+    session_headers = response.headers.get_list("set-cookie")
+    assert any("sreality_session=" in header and "HttpOnly" in header for header in session_headers)
+    assert any("Secure" in header and "SameSite=lax" in header for header in session_headers)
+    engine.dispose()
+
+
+def test_archived_image_is_owner_only_and_served_with_safe_headers() -> None:
+    engine = create_engine("sqlite+pysqlite:///:memory:")
+    session = Mock(spec=Session)
+    session.scalar.return_value = "favorite-images/1/image.bin"
+    storage = Mock(spec=ImageArchiveStorage)
+    storage.load.return_value = ArchivedImageContent(
+        content=b"\xff\xd8\xffimage",
+        content_type="image/jpeg",
+    )
+    archiver = ImageArchiver(
+        fetcher=cast(ImageFetcher, Mock(spec=ImageFetcher)),
+        storage=cast(ImageArchiveStorage, storage),
+    )
+    app = create_app(
+        settings=build_test_settings(),
+        engine=engine,
+        image_archiver=archiver,
+    )
+
+    def override_session() -> Session:
+        return cast(Session, session)
+
+    app.dependency_overrides[get_session] = override_session
+    [response] = asyncio.run(
+        request_many(
+            app,
+            "/api/v1/listings/1/images/0/archive",
+            headers=owner_headers(app),
+        )
+    )
+    assert response.status_code == 200
+    assert response.content == b"\xff\xd8\xffimage"
+    assert response.headers["content-type"] == "image/jpeg"
+    assert response.headers["cache-control"].startswith("private")
+    assert response.headers["x-content-type-options"] == "nosniff"
+    storage.load.assert_called_once_with(key="favorite-images/1/image.bin")
     engine.dispose()

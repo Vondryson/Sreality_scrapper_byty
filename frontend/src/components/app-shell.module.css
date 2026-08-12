@@ -1,0 +1,12 @@
+.frame { min-height: 100vh; display: grid; grid-template-rows: auto 1fr auto; }
+.skipLink { position: fixed; top: var(--space-2); left: var(--space-2); z-index: 1000; padding: .65rem .85rem; color: white; background: var(--color-accent); border-radius: var(--radius-sm); font-weight: 800; transform: translateY(-150%); }
+.skipLink:focus { transform: translateY(0); }
+.header { position: sticky; top: 0; z-index: 10; display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); min-height: 4.75rem; padding: var(--space-3) max(var(--space-5), calc((100vw - var(--content-width)) / 2)); background: color-mix(in srgb, var(--color-bg) 92%, transparent); border-bottom: 1px solid var(--color-border); backdrop-filter: blur(12px); }
+.brand { display: flex; align-items: center; gap: var(--space-3); color: var(--color-text); text-decoration: none; }
+.brand strong, .brand small { display: block; }
+.brand strong { letter-spacing: -.02em; }
+.brand small { margin-top: .1rem; color: var(--color-text-muted); font-size: .75rem; }
+.mark { display: grid; place-items: center; width: 2.75rem; height: 2.75rem; color: white; background: var(--color-accent); border-radius: .85rem; font-size: .8rem; font-weight: 800; letter-spacing: .08em; box-shadow: var(--shadow-sm); }
+.main { width: min(100% - 2 * var(--space-5), var(--content-width)); margin-inline: auto; padding-block: clamp(2rem, 6vw, 5rem); }
+.footer { padding: var(--space-5); color: var(--color-text-muted); background: var(--color-surface); border-top: 1px solid var(--color-border); text-align: center; font-size: .85rem; }
+@media (max-width: 34rem) { .header { min-height: 4.25rem; } }

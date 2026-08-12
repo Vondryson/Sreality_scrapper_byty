@@ -184,6 +184,8 @@ Backend používá authorization-code flow se state, nonce a PKCE, ověřuje Goo
 ID token a přesný `SREALITY_OWNER_EMAIL`. Osmihodinová session cookie je
 `HttpOnly`, `Secure`, `SameSite=Lax`; zápisové requesty musí poslat CSRF token
 z `GET /api/v1/auth/session` v hlavičce `X-CSRF-Token`.
+Po úspěšném callbacku backend přesměruje pouze na pevně nakonfigurovaný a
+validovaný origin `SREALITY_FRONTEND_URL` (lokálně `http://localhost:3000`).
 
 Owner-only provozní API:
 
