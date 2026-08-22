@@ -1,0 +1,26 @@
+.git
+.github
+.idea
+.vscode
+.venv
+venv
+**/__pycache__
+**/*.py[cod]
+**/.pytest_cache
+**/.mypy_cache
+**/.ruff_cache
+**/*.egg-info
+.coverage
+htmlcov
+frontend
+old version
+.docker-data
+data
+data_*
+*.db
+*.log
+*.png
+*.pbix
+.env
+.env.*
+!.env.example

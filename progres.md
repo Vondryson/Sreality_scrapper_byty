@@ -2,12 +2,12 @@
 
 ## Aktuální stav
 
-- Poslední aktualizace: 2026-08-11
-- Aktuální milník: M3 – Český responzivní frontend (cloudová brána `M0-05` zůstává blokovaná)
-- Aktuální hlavní task: žádný – brána M3 je dokončena
-- Následující doporučený task: `M4-01` – Připravit produkční Docker images
-- Blokátory: celková nákladová brána M0-05 zůstává otevřená do uzavření kompletního GCP rozpočtu; lokální implementaci M2 neblokuje
-- Souhrn: 31 dokončeno, 0 rozpracováno, 1 blokováno, 11 čeká
+- Poslední aktualizace: 2026-08-22
+- Aktuální milník: M4 – GCP infrastruktura a automatizovaný provoz
+- Aktuální hlavní task: `M4-02` – Založit Terraform state a základ projektu
+- Následující doporučený task: ověřit bootstrap a remote-state Terraform plan
+- Blokátory: žádné
+- Souhrn: 33 dokončeno, 1 rozpracováno, 0 blokováno, 9 čeká
 
 ## Legenda
 
@@ -28,7 +28,7 @@ Najednou má být `[~]` označen nejvýše jeden hlavní task. Dílčí paraleln
 - [x] `M0-02` – Ověřit živé filtry a stránkování Sreality.
 - [x] `M0-03` – Zachytit anonymizované fixtures chaty a chalupy.
 - [x] `M0-04` – Udělat profil polí a fotografií.
-- [!] `M0-05` – Ověřit GCP náklady a technické předpoklady.
+- [x] `M0-05` – Ověřit GCP náklady a technické předpoklady.
 
 ## M1 – PostgreSQL a spolehlivá datová pipeline
 
@@ -67,8 +67,8 @@ Najednou má být `[~]` označen nejvýše jeden hlavní task. Dílčí paraleln
 
 ## M4 – GCP infrastruktura a automatizovaný provoz
 
-- [ ] `M4-01` – Připravit produkční Docker images.
-- [ ] `M4-02` – Založit Terraform state a základ projektu.
+- [x] `M4-01` – Připravit produkční Docker images.
+- [~] `M4-02` – Založit Terraform state a základ projektu.
 - [ ] `M4-03` – Vytvořit Cloud SQL, Storage a lifecycle.
 - [ ] `M4-04` – Vytvořit IAM, service accounts a secrets.
 - [ ] `M4-05` – Nasadit Cloud Run services a scraper job.
@@ -84,7 +84,13 @@ Najednou má být `[~]` označen nejvýše jeden hlavní task. Dílčí paraleln
 
 ## Pracovní poznámky k aktivnímu tasku
 
-Žádný aktivní task. Další práce začne taskem `M4-01` po kontrole této M3 sady změn.
+### 2026-08-12 – `M4-02`
+
+- Plán: oddělit bootstrap GCS state bucketu od hlavního modulu, připnout Terraform/provider verze, projekt, region, labels a bezpečné API enablement; ověřit formát, validaci a plány bez nečekaných destruktivních změn.
+- Rozsah: `infra/terraform`, remote backend konfigurace, state recovery pravidla a provozní README.
+- Rizika: state bucket musí vzniknout před inicializací GCS backendu; aplikovat lze pouze v osobním projektu `sreality-scrapper-504307`.
+- Předpoklad: uživatel 12. srpna 2026 schválil podmíněný cloudový provoz kolem 276 Kč měsíčně bez případné DPH, budget upozornění 200/300 Kč a lokální fallback nad 300 Kč.
+- Stav: oba Terraform moduly jsou validní v oficiálním Terraform 1.15.8 image; bootstrap plan obsahuje přesně `1 add, 0 change, 0 destroy`. Apply nevytvořil žádný prostředek, protože uložené ADC má neplatný refresh token a lokální gcloud token refresh blokuje Avast TLS inspekce. Pokračování čeká na nový interaktivní ADC login.
 
 Při zahájení tasku sem zapsat:
 
@@ -99,13 +105,7 @@ Po dokončení stručnou poznámku přesunout do historie níže.
 
 ## Blokátory a otevřené otázky
 
-### `M0-05` – dokončení cloudové nákladové brány
-
-- Blokující podmínka: zbývá dokončit technické/API a rozpočtové pojistky cloudové brány.
-- Ověřeno: účet `vondryswow@gmail.com` má přístup k aktivnímu osobnímu projektu `sreality-scrapper-504307` (`projectNumber=545468906541`), projekt má aktivní billing a `routes.googleapis.com` je zapnuté. Pracovní konfigurace `default` a projekt `maiven-lab-dev` zůstaly beze změny a jsou výslovně mimo rozsah tohoto projektu.
-- Vedlejší změna: při read-only kontrole Google CLI se souhlasem uživatele automaticky zapnulo `cloudresourcemanager.googleapis.com`; tato řídicí služba sama nespouští aplikační workload.
-- Chybí: ověřit krátkodobý OAuth credential, provést jeden kontrolovaný request a uzavřít celkovou kalkulaci/rozhodnutí cloudového provozu.
-- Dopad: blokuje uzavření brány M0 a cloudové tasky závislé na M0-05 (`M2-03`, `M4-02`); neblokuje lokální návrh databáze od `M1-01`.
+Žádné otevřené blokátory. Rozpočtová brána `M0-05` byla 12. srpna 2026 uzavřena podmíněným schválením cloudového provozu.
 
 Položka označená `[!]` musí zde uvést:
 
@@ -115,6 +115,13 @@ Položka označená `[!]` musí zde uvést:
 - které další tasky blokuje.
 
 ## Historie dokončené práce
+
+### 2026-08-12 – `M4-01`
+
+- Přidány multi-stage produkční images pro API a scraper z jednoho Python Dockerfile a samostatný Next.js standalone frontend image; dependency grafy jsou zamčené přes `requirements-prod.txt` a `package-lock.json`.
+- Images běží jako `10001:10001`, neobsahují lokální data, secrets ani vývojové build kontexty a mají velikosti 74,4 MiB (API), 74,4 MiB (scraper) a 88,2 MiB (frontend).
+- Izolovaný Compose smoke stack používá PostgreSQL v `tmpfs`; ověřil zdravý API/backend, frontend proxy, liveness, readiness a read-only scraper DB check. První smoke odhalil poškozený lock po timeoutu, následná atomická regenerace a instalace do `/opt/venv` problém odstranila.
+- Ověření: Docker build všech tří images prošel; 105 backend unit testů, 28 frontend testů a produkční Next.js standalone build prošly.
 
 ### 2026-08-11 – oprava živého scraperu po změně detailního SSR
 

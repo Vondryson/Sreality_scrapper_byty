@@ -7,6 +7,7 @@ if (!/^https?:\/\/[^/]+(?::\d+)?$/.test(backendUrl)) {
 }
 
 const nextConfig: NextConfig = {
+  output: "standalone",
   poweredByHeader: false,
   images: {
     remotePatterns: [{ protocol: "https", hostname: "**.sdn.cz" }],

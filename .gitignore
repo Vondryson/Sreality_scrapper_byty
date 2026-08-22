@@ -39,6 +39,10 @@ test-results/
 
 # Terraform
 .terraform/
+.terraform.tfstate.lock.info
+terraform.tfstate
+terraform.tfstate.*
+backend.hcl
 *.tfstate
 *.tfstate.*
 *.tfplan
