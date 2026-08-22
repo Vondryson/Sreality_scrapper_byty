@@ -53,6 +53,20 @@ Databázový uživatel ani heslo se zde nevytvářejí, protože by se citlivá 
 dostala do Terraform state. Service accounts, IAM a Secret Manager postup doplní
 `M4-04`; produkční migrace se ověří až s touto identitou.
 
+## Runtime identity a secrets
+
+API, frontend a scraper používají tři samostatné service accounts. API a scraper
+smějí připojit pouze Cloud SQL connector; k aplikačnímu bucketu mají pouze kombinaci
+`objectCreator` + `objectViewer`, takže runtime nemůže objekty mazat ani přepisovat.
+Scraper navíc smí spotřebovávat projektovou API kvótu pro Google Routes. Frontend
+nemá přístup k databázi, bucketu ani aplikačním secretům.
+
+Terraform vytváří prázdné, regionálně replikované Secret Manager kontejnery pro
+databázové URL, Google OAuth konfiguraci, owner e-mail a session secret. Záměrně
+nevytváří `google_secret_manager_secret_version`: hodnoty se naplní mimo Terraform
+a nikdy se proto neobjeví v konfiguraci, plánu ani state. API získá pouze svých pět
+secretů, scraper pouze databázové URL.
+
 ## Autentizace
 
 Lokálně Terraform používá Application Default Credentials osobního účtu. Doporučený

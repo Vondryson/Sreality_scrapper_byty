@@ -33,3 +33,17 @@ output "application_storage" {
     raw_payload_prefix    = "raw/"
   }
 }
+
+output "runtime_service_accounts" {
+  description = "Dedicated least-privilege identities attached to Cloud Run workloads."
+  value = {
+    for name, account in google_service_account.runtime : name => account.email
+  }
+}
+
+output "runtime_secret_ids" {
+  description = "Empty Secret Manager containers that must be populated outside Terraform."
+  value = {
+    for name, secret in google_secret_manager_secret.runtime : name => secret.secret_id
+  }
+}

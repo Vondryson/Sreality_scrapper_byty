@@ -23,4 +23,88 @@ locals {
     "sqladmin.googleapis.com",
     "storage.googleapis.com",
   ])
+
+  runtime_service_accounts = {
+    api = {
+      display_name = "Sreality API runtime"
+      description  = "Identity used only by the private FastAPI Cloud Run service."
+    }
+    frontend = {
+      display_name = "Sreality frontend runtime"
+      description  = "Identity used only by the public login/frontend Cloud Run service."
+    }
+    scraper = {
+      display_name = "Sreality scraper runtime"
+      description  = "Identity used only by the scheduled scraper Cloud Run job."
+    }
+  }
+
+  project_iam_grants = {
+    api_cloud_sql = {
+      service = "api"
+      role    = "roles/cloudsql.client"
+    }
+    scraper_cloud_sql = {
+      service = "scraper"
+      role    = "roles/cloudsql.client"
+    }
+    scraper_service_usage = {
+      service = "scraper"
+      role    = "roles/serviceusage.serviceUsageConsumer"
+    }
+  }
+
+  storage_iam_grants = {
+    api_create = {
+      service = "api"
+      role    = "roles/storage.objectCreator"
+    }
+    api_read = {
+      service = "api"
+      role    = "roles/storage.objectViewer"
+    }
+    scraper_create = {
+      service = "scraper"
+      role    = "roles/storage.objectCreator"
+    }
+    scraper_read = {
+      service = "scraper"
+      role    = "roles/storage.objectViewer"
+    }
+  }
+
+  runtime_secrets = toset([
+    "database-url",
+    "google-oauth-client-id",
+    "google-oauth-client-secret",
+    "owner-email",
+    "session-secret",
+  ])
+
+  secret_access_grants = {
+    api_database = {
+      service = "api"
+      secret  = "database-url"
+    }
+    api_oauth_client_id = {
+      service = "api"
+      secret  = "google-oauth-client-id"
+    }
+    api_oauth_client_secret = {
+      service = "api"
+      secret  = "google-oauth-client-secret"
+    }
+    api_owner_email = {
+      service = "api"
+      secret  = "owner-email"
+    }
+    api_session_secret = {
+      service = "api"
+      secret  = "session-secret"
+    }
+    scraper_database = {
+      service = "scraper"
+      secret  = "database-url"
+    }
+  }
 }

@@ -78,4 +78,59 @@ run "keeps_data_foundation_within_mvp_guardrails" {
     )
     error_message = "The 90-day lifecycle must only target raw payloads."
   }
+
+  assert {
+    condition = toset(values(google_service_account.runtime)[*].account_id) == toset([
+      "sreality-tracker-api",
+      "sreality-tracker-frontend",
+      "sreality-tracker-scraper",
+    ])
+    error_message = "Every Cloud Run workload must have its own runtime identity."
+  }
+
+  assert {
+    condition = toset(values(google_project_iam_member.runtime)[*].role) == toset([
+      "roles/cloudsql.client",
+      "roles/serviceusage.serviceUsageConsumer",
+    ])
+    error_message = "Runtime project roles must remain limited to Cloud SQL and API consumption."
+  }
+
+  assert {
+    condition = toset(values(google_storage_bucket_iam_member.runtime)[*].role) == toset([
+      "roles/storage.objectCreator",
+      "roles/storage.objectViewer",
+    ])
+    error_message = "Runtime bucket access must not include object deletion or bucket administration."
+  }
+
+  assert {
+    condition = toset(keys(google_secret_manager_secret.runtime)) == toset([
+      "database-url",
+      "google-oauth-client-id",
+      "google-oauth-client-secret",
+      "owner-email",
+      "session-secret",
+    ])
+    error_message = "Terraform must create exactly the approved empty runtime secret containers."
+  }
+
+  assert {
+    condition = alltrue([
+      for secret in values(google_secret_manager_secret.runtime) :
+      one(one(one(secret.replication).user_managed).replicas).location == "europe-west1"
+    ])
+    error_message = "Runtime secrets must use only the approved regional replication location."
+  }
+
+  assert {
+    condition = (
+      length(google_secret_manager_secret_iam_member.runtime) == 6 &&
+      alltrue([
+        for grant in values(google_secret_manager_secret_iam_member.runtime) :
+        grant.role == "roles/secretmanager.secretAccessor"
+      ])
+    )
+    error_message = "Only the six explicit runtime secret accessor grants are allowed."
+  }
 }

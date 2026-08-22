@@ -92,6 +92,7 @@ Najednou má být `[~]` označen nejvýše jeden hlavní task. Dílčí paraleln
 - Předpoklad: uživatel 12. srpna 2026 schválil podmíněný cloudový provoz kolem 276 Kč měsíčně bez případné DPH, budget upozornění 200/300 Kč a lokální fallback nad 300 Kč.
 - Stav: oba Terraform moduly jsou validní v oficiálním Terraform 1.15.8 image; bootstrap plan obsahuje přesně `1 add, 0 change, 0 destroy`. Apply nevytvořil žádný prostředek, protože uložené ADC má neplatný refresh token a lokální gcloud token refresh blokuje Avast TLS inspekce. Pokračování čeká na nový interaktivní ADC login.
 - Dílčí pokračování 2026-08-22: připraven lokální základ `M4-03` pro zonální Cloud SQL, společný neveřejný aplikační bucket, 90denní raw lifecycle a mockované Terraform guardrail testy. Oficiální Terraform 1.15.8 Linux image potvrdil validní konfiguraci a `terraform test` prošel `1 passed, 0 failed`. Apply ani přechod hlavního tasku neproběhl, dokud není ověřen remote state.
+- Dílčí pokračování 2026-08-22: připraven lokální základ `M4-04` se třemi oddělenými runtime service accounts, nejmenšími Cloud SQL/Storage/Routes oprávněními a regionálními Secret Manager kontejnery bez secret verzí v Terraform state.
 
 Při zahájení tasku sem zapsat:
 
