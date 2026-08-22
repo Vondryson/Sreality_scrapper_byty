@@ -35,6 +35,24 @@ terraform plan -out production.tfplan
 Plán před aplikací musí být ručně zkontrolovaný; neočekávané `destroy` nebo `replace`
 akce znamenají zastavit a zjistit příčinu.
 
+## Datový základ
+
+Kořenový modul vytváří jednu zonální PostgreSQL 16 instanci a jeden regionální
+aplikační bucket:
+
+- Cloud SQL používá `db-f1-micro`, Enterprise edition, 10GiB SSD s automatickým
+  růstem omezeným na 15 GiB, denní zálohy a sedm uložených backupů bez PITR;
+- Terraform i Cloud SQL API chrání instanci před smazáním, přímá databázová
+  spojení mimo Cloud SQL Auth Proxy/connector jsou odmítnutá;
+- aplikační bucket má uniform bucket-level access, vynucenou prevenci veřejného
+  přístupu a sedmidenní soft-delete ochranu;
+- objekty pod `raw/` se po 90 dnech lifecycle pravidlem odstraní, zatímco
+  `favorite-images/` nemá automatickou expiraci.
+
+Databázový uživatel ani heslo se zde nevytvářejí, protože by se citlivá hodnota
+dostala do Terraform state. Service accounts, IAM a Secret Manager postup doplní
+`M4-04`; produkční migrace se ověří až s touto identitou.
+
 ## Autentizace
 
 Lokálně Terraform používá Application Default Credentials osobního účtu. Doporučený
@@ -55,5 +73,5 @@ OAuth client secret nebo databázová hesla.
 terraform fmt -check -recursive
 terraform init -backend=false
 terraform validate
+terraform test
 ```
-
