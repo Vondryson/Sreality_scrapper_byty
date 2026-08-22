@@ -149,8 +149,18 @@ sreality-scrape run --logical-key "manual:2026-08-11T1200"
 
 CLI vypisuje jediný strojově čitelný JSON objekt a při chybě zveřejní pouze typ
 výjimky, nikoli credentials nebo obsah odpovědi. Lokální `run` používá
-`SREALITY_RAW_STORAGE_PATH`; produkční volba GCS adaptéru patří do cloudového
-wiringu.
+`SREALITY_RAW_STORAGE_PATH`. Produkce přepne raw payloady scraperu i archiv
+oblíbených fotografií na společný neveřejný bucket pomocí:
+
+```text
+SREALITY_STORAGE_BACKEND=gcs
+SREALITY_GCP_PROJECT_ID=sreality-scrapper-504307
+SREALITY_STORAGE_BUCKET=sreality-scrapper-504307-application-data
+```
+
+Jiný projekt nebo bucket validace odmítne. GCS adaptéry používají create-only
+precondition, takže opakování stejného zápisu je idempotentní a odlišný obsah se
+nikdy nepřepíše.
 
 ## Google Routes
 

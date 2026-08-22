@@ -13,7 +13,12 @@ from sqlalchemy import text
 
 from sreality_tracker import __version__
 from sreality_tracker.core.logging import configure_logging
-from sreality_tracker.core.settings import ConfigurationError, Settings, load_settings
+from sreality_tracker.core.settings import (
+    ConfigurationError,
+    Settings,
+    StorageBackend,
+    load_settings,
+)
 from sreality_tracker.db.models import ScrapeRunStatus, ScrapeRunTrigger
 from sreality_tracker.db.session import create_database_engine, create_session_factory
 from sreality_tracker.distances.road import BackfillResult, RoadDistanceEnricher
@@ -21,7 +26,7 @@ from sreality_tracker.distances.routes import RoutesClient
 from sreality_tracker.scraper.client import SrealityClient
 from sreality_tracker.scraper.pipeline import RunResult, ScrapePipeline
 from sreality_tracker.scraper.source import SrealityListingSource
-from sreality_tracker.storage.raw import LocalRawStorage
+from sreality_tracker.storage.raw import GcsRawStorage, LocalRawStorage, RawStorage
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -107,7 +112,7 @@ def _run_pipeline(settings: Settings, *, logical_key: str, trigger: ScrapeRunTri
             pipeline = ScrapePipeline(
                 session_factory=session_factory,
                 source=SrealityListingSource(client),
-                raw_storage=LocalRawStorage(Path.cwd() / settings.raw_storage_path),
+                raw_storage=_raw_storage(settings),
                 scraper_version=__version__,
                 road_distance_enricher=(
                     None
@@ -125,6 +130,16 @@ def _run_pipeline(settings: Settings, *, logical_key: str, trigger: ScrapeRunTri
                     routes_client.close()
     finally:
         engine.dispose()
+
+
+def _raw_storage(settings: Settings) -> RawStorage:
+    if settings.storage_backend is StorageBackend.GCS:
+        assert settings.storage_bucket is not None
+        return GcsRawStorage.from_bucket_name(
+            settings.storage_bucket,
+            project=settings.gcp_project_id,
+        )
+    return LocalRawStorage(Path.cwd() / settings.raw_storage_path)
 
 
 def _result_payload(result: RunResult) -> dict[str, object]:

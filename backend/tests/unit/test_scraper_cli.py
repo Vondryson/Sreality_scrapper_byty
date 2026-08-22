@@ -5,7 +5,7 @@ from types import SimpleNamespace
 
 import pytest
 
-from sreality_tracker.core.settings import ConfigurationError
+from sreality_tracker.core.settings import ConfigurationError, StorageBackend
 from sreality_tracker.scraper import cli
 
 
@@ -64,3 +64,22 @@ def test_routes_backfill_returns_usage_metric(
         "failed": 0,
         "provider_requests": 2,
     }
+
+
+def test_raw_storage_selects_validated_gcs_bucket(monkeypatch: pytest.MonkeyPatch) -> None:
+    expected = object()
+    settings = SimpleNamespace(
+        storage_backend=StorageBackend.GCS,
+        storage_bucket="sreality-scrapper-504307-application-data",
+        gcp_project_id="sreality-scrapper-504307",
+    )
+    calls: list[tuple[str, str | None]] = []
+
+    def from_bucket_name(bucket_name: str, *, project: str | None = None) -> object:
+        calls.append((bucket_name, project))
+        return expected
+
+    monkeypatch.setattr(cli.GcsRawStorage, "from_bucket_name", from_bucket_name)
+
+    assert cli._raw_storage(settings) is expected
+    assert calls == [("sreality-scrapper-504307-application-data", "sreality-scrapper-504307")]

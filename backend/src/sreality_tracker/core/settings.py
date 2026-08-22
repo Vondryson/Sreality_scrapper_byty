@@ -19,6 +19,11 @@ class Environment(StrEnum):
     PRODUCTION = "production"
 
 
+class StorageBackend(StrEnum):
+    LOCAL = "local"
+    GCS = "gcs"
+
+
 class ConfigurationError(RuntimeError):
     """Raised when application settings are missing or invalid."""
 
@@ -34,6 +39,9 @@ class Settings(BaseSettings):
 
     environment: Environment = Environment.LOCAL
     database_url: SecretStr
+    storage_backend: StorageBackend = StorageBackend.LOCAL
+    storage_bucket: str | None = None
+    gcp_project_id: str | None = None
     raw_storage_path: Path = Path("data/raw")
     log_level: Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"] = "INFO"
     http_timeout_seconds: float = Field(default=20.0, gt=0, le=120)
@@ -47,9 +55,7 @@ class Settings(BaseSettings):
     routes_max_attempts: int = Field(default=3, ge=1, le=6)
     google_oauth_client_id: str | None = None
     google_oauth_client_secret: SecretStr | None = None
-    google_oauth_redirect_uri: str = (
-        "http://localhost:8000/api/v1/auth/google/callback"
-    )
+    google_oauth_redirect_uri: str = "http://localhost:8000/api/v1/auth/google/callback"
     frontend_url: str = "http://localhost:3000"
     owner_email: str | None = None
     session_secret: SecretStr | None = None
@@ -120,6 +126,16 @@ class Settings(BaseSettings):
         local_http = redirect.scheme == "http" and redirect.hostname == "localhost"
         if redirect.scheme != "https" and not local_http:
             raise ValueError("OAuth redirect URI must use HTTPS or HTTP localhost")
+        return self
+
+    @model_validator(mode="after")
+    def validate_storage_backend(self) -> Settings:
+        if self.storage_backend is StorageBackend.LOCAL:
+            return self
+        if self.gcp_project_id != "sreality-scrapper-504307":
+            raise ValueError("GCS storage requires the approved GCP project")
+        if self.storage_bucket != "sreality-scrapper-504307-application-data":
+            raise ValueError("GCS storage requires the approved private application bucket")
         return self
 
 

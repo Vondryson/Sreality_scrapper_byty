@@ -21,10 +21,15 @@ from sreality_tracker.api.owner import require_owner
 from sreality_tracker.api.system import router as system_router
 from sreality_tracker.api.user_listing_service import ImageArchiver
 from sreality_tracker.api.user_listings import router as user_listings_router
-from sreality_tracker.core.settings import Settings, load_settings
+from sreality_tracker.core.settings import Settings, StorageBackend, load_settings
 from sreality_tracker.db.models import ScrapeRunTrigger
 from sreality_tracker.db.session import create_database_engine, create_session_factory
-from sreality_tracker.storage.images import HttpxImageFetcher, LocalImageArchiveStorage
+from sreality_tracker.storage.images import (
+    GcsImageArchiveStorage,
+    HttpxImageFetcher,
+    ImageArchiveStorage,
+    LocalImageArchiveStorage,
+)
 
 API_V1_PREFIX = "/api/v1"
 
@@ -48,7 +53,7 @@ def create_app(
         session_factory=create_session_factory(resolved_engine),
         readiness_probe=probe,
         owns_engine=owns_engine,
-        image_archiver=image_archiver or _local_image_archiver(resolved_settings),
+        image_archiver=image_archiver or _image_archiver(resolved_settings),
         auth_manager=auth_manager or _auth_manager(resolved_settings),
         manual_scrape_trigger=manual_scrape_trigger or _local_manual_trigger(resolved_settings),
     )
@@ -100,10 +105,19 @@ def _database_probe(engine: Engine) -> Callable[[], bool]:
     return probe
 
 
-def _local_image_archiver(settings: Settings) -> ImageArchiver:
+def _image_archiver(settings: Settings) -> ImageArchiver:
+    storage: ImageArchiveStorage
+    if settings.storage_backend is StorageBackend.GCS:
+        assert settings.storage_bucket is not None
+        storage = GcsImageArchiveStorage.from_bucket_name(
+            settings.storage_bucket,
+            project=settings.gcp_project_id,
+        )
+    else:
+        storage = LocalImageArchiveStorage(settings.raw_storage_path / "images")
     return ImageArchiver(
         fetcher=HttpxImageFetcher(timeout_seconds=settings.http_timeout_seconds),
-        storage=LocalImageArchiveStorage(settings.raw_storage_path / "images"),
+        storage=storage,
     )
 
 

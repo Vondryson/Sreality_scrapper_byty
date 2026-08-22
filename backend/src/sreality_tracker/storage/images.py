@@ -7,10 +7,12 @@ import os
 import tempfile
 from dataclasses import dataclass
 from pathlib import Path, PurePosixPath
-from typing import Protocol
+from typing import Protocol, cast
 from urllib.parse import urlparse
 
 import httpx
+from google.api_core.exceptions import GoogleAPICallError, NotFound, PreconditionFailed
+from google.cloud import storage as google_storage  # type: ignore[import-untyped]
 
 IMAGE_PREFIX = "favorite-images"
 MAX_IMAGE_BYTES = 20 * 1024 * 1024
@@ -51,6 +53,23 @@ class ImageFetcher(Protocol):
 class ImageArchiveStorage(Protocol):
     def store(self, *, key: str, image: FetchedImage) -> ArchivedImage: ...
     def load(self, *, key: str) -> ArchivedImageContent: ...
+
+
+class _BlobLike(Protocol):
+    def upload_from_string(
+        self,
+        data: bytes,
+        *,
+        content_type: str,
+        if_generation_match: int,
+        checksum: str,
+    ) -> None: ...
+
+    def download_as_bytes(self, *, checksum: str = "auto") -> bytes: ...
+
+
+class _BucketLike(Protocol):
+    def blob(self, blob_name: str) -> _BlobLike: ...
 
 
 class HttpxImageFetcher:
@@ -138,17 +157,61 @@ class LocalImageArchiveStorage:
         return ArchivedImageContent(content=content, content_type=content_type)
 
     def _safe_path(self, key: str) -> Path:
-        path = PurePosixPath(key)
-        if (
-            path.is_absolute()
-            or ".." in path.parts
-            or not key.startswith(f"{IMAGE_PREFIX}/")
-        ):
-            raise ValueError("invalid image archive key")
+        path = _validate_image_key(key)
         target = (self._root / Path(*path.parts)).resolve()
         if not target.is_relative_to(self._root):
             raise ValueError("image archive key escapes the storage root")
         return target
+
+
+class GcsImageArchiveStorage:
+    """Store immutable favorite images in a private Google Cloud Storage bucket."""
+
+    def __init__(self, bucket: _BucketLike) -> None:
+        self._bucket = bucket
+
+    @classmethod
+    def from_bucket_name(
+        cls, bucket_name: str, *, project: str | None = None
+    ) -> GcsImageArchiveStorage:
+        if not bucket_name.strip():
+            raise ValueError("bucket_name must not be empty")
+        client = google_storage.Client(project=project)
+        return cls(cast(_BucketLike, client.bucket(bucket_name)))
+
+    def store(self, *, key: str, image: FetchedImage) -> ArchivedImage:
+        _validate_image_key(key)
+        digest = hashlib.sha256(image.content).hexdigest()
+        result = ArchivedImage(key=key, sha256=digest, size=len(image.content))
+        blob = self._bucket.blob(key)
+        try:
+            blob.upload_from_string(
+                image.content,
+                content_type=image.content_type,
+                if_generation_match=0,
+                checksum="crc32c",
+            )
+        except PreconditionFailed:
+            if blob.download_as_bytes(checksum="auto") != image.content:
+                raise ImageArchiveConflictError("archive key contains different content") from None
+        except GoogleAPICallError as error:
+            raise ImageArchiveError("image archive write failed") from error
+        return result
+
+    def load(self, *, key: str) -> ArchivedImageContent:
+        _validate_image_key(key)
+        try:
+            content = self._bucket.blob(key).download_as_bytes(checksum="auto")
+        except NotFound as error:
+            raise ImageArchiveError("archived image is unavailable") from error
+        except GoogleAPICallError as error:
+            raise ImageArchiveError("image archive read failed") from error
+        if len(content) > MAX_IMAGE_BYTES:
+            raise ImageArchiveError("archived image exceeds the size limit")
+        content_type = _bitmap_content_type(content)
+        if content_type is None:
+            raise ImageArchiveError("archived image has an invalid format")
+        return ArchivedImageContent(content=content, content_type=content_type)
 
 
 def image_archive_key(*, listing_id: int, source_fingerprint: str) -> str:
@@ -159,6 +222,13 @@ def image_archive_key(*, listing_id: int, source_fingerprint: str) -> str:
     ):
         raise ValueError("source_fingerprint must be a lowercase SHA-256 digest")
     return f"{IMAGE_PREFIX}/{listing_id}/{source_fingerprint}.bin"
+
+
+def _validate_image_key(key: str) -> PurePosixPath:
+    path = PurePosixPath(key)
+    if path.is_absolute() or ".." in path.parts or not key.startswith(f"{IMAGE_PREFIX}/"):
+        raise ValueError("invalid image archive key")
+    return path
 
 
 def _is_allowed_source(scheme: str, hostname: str | None) -> bool:

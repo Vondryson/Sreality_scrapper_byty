@@ -4,7 +4,12 @@ from pathlib import Path
 
 import pytest
 
-from sreality_tracker.core.settings import ConfigurationError, Environment, load_settings
+from sreality_tracker.core.settings import (
+    ConfigurationError,
+    Environment,
+    StorageBackend,
+    load_settings,
+)
 
 DATABASE_URL = "postgresql+psycopg://sreality:sreality_local_only@localhost:5432/sreality_tracker"
 
@@ -24,6 +29,7 @@ def test_settings_load_valid_environment(monkeypatch: pytest.MonkeyPatch) -> Non
     settings = load_settings()
 
     assert settings.environment is Environment.TEST
+    assert settings.storage_backend is StorageBackend.LOCAL
     assert settings.database_url_value() == DATABASE_URL
     assert settings.raw_storage_path == Path("data/test-raw")
     assert settings.log_level == "WARNING"
@@ -88,3 +94,25 @@ def test_partial_oauth_configuration_and_short_session_secret_are_rejected(
     monkeypatch.setenv("SREALITY_SESSION_SECRET", "too-short")
     with pytest.raises(ConfigurationError, match="at least 32 bytes"):
         load_settings()
+
+
+def test_gcs_storage_requires_exact_approved_project_and_bucket(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("SREALITY_DATABASE_URL", DATABASE_URL)
+    monkeypatch.setenv("SREALITY_STORAGE_BACKEND", "gcs")
+    monkeypatch.setenv("SREALITY_GCP_PROJECT_ID", "wrong-project")
+    monkeypatch.setenv("SREALITY_STORAGE_BUCKET", "wrong-bucket")
+
+    with pytest.raises(ConfigurationError, match="approved GCP project"):
+        load_settings()
+
+    monkeypatch.setenv("SREALITY_GCP_PROJECT_ID", "sreality-scrapper-504307")
+    with pytest.raises(ConfigurationError, match="approved private application bucket"):
+        load_settings()
+
+    monkeypatch.setenv("SREALITY_STORAGE_BUCKET", "sreality-scrapper-504307-application-data")
+    settings = load_settings()
+
+    assert settings.storage_backend is StorageBackend.GCS
+    assert settings.gcp_project_id == "sreality-scrapper-504307"
