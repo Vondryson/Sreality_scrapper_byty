@@ -4,10 +4,10 @@
 
 - Poslední aktualizace: 2026-08-23
 - Aktuální milník: M4 – GCP infrastruktura a automatizovaný provoz
-- Aktuální hlavní task: `M4-06` – Přidat Scheduler, ruční běh a CI/CD
-- Následující doporučený task: doplnit autorizovaný pondělní Scheduler, produkční ruční Cloud Run trigger a CI/deployment runbook
+- Aktuální hlavní task: žádný – `M4-06` je uzavřeno
+- Následující doporučený task: `M4-07` – Přidat monitoring, e-mail a obnovu
 - Blokátory: žádné
-- Souhrn: 36 dokončeno, 1 rozpracováno, 0 blokováno, 6 čeká
+- Souhrn: 37 dokončeno, 0 rozpracováno, 0 blokováno, 6 čeká
 
 ## Legenda
 
@@ -72,7 +72,7 @@ Najednou má být `[~]` označen nejvýše jeden hlavní task. Dílčí paraleln
 - [x] `M4-03` – Vytvořit Cloud SQL, Storage a lifecycle.
 - [x] `M4-04` – Vytvořit IAM, service accounts a secrets.
 - [x] `M4-05` – Nasadit Cloud Run services a scraper job.
-- [~] `M4-06` – Přidat Scheduler, ruční běh a CI/CD.
+- [x] `M4-06` – Přidat Scheduler, ruční běh a CI/CD.
 - [ ] `M4-07` – Přidat monitoring, e-mail a obnovu.
 - [ ] `M4-08` – Nastavit a ověřit rozpočtové pojistky.
 
@@ -109,7 +109,7 @@ Najednou má být `[~]` označen nejvýše jeden hlavní task. Dílčí paraleln
 - Produkční plný běh 2026-08-23: po výslovném souhlasu byl kvůli nedostupné sdílené browser session spuštěn přímo Cloud Run Job s manuálním logical key. Execution `sreality-tracker-scraper-cnzxd` skončila úspěšně za 25 min 34 s bez retry; run `d50dd841-57c2-49d1-be53-802e408e8d23` uložil 3 580 nabídek (`new=3580`, `changed=0`, `errors=0`, `deactivated=0`) a obě kategorie označil jako kompletní. Raw payload každé nabídky je přítomný v GCS.
 - Owner-trigger ověření 2026-08-23: přihlášená produkční session s platným CSRF tokenem dostala `202` a vytvořila run `6562af34-8e02-4b77-aee4-d9e681563d5b`. Execution `sreality-tracker-scraper-nl62g` vytvořila přímo API service account přes omezenou custom roli a skončila úspěšně za 14 min 13 s; výsledek byl `found=3583`, `new=7`, `changed=15`, `deactivated=4`, `errors=0`, obě kategorie kompletní. Tím je prakticky ověřen celý tok browser session/CSRF → API → Cloud Run Job → Cloud SQL/GCS.
 - Předcommitové CI ověření: backend Ruff check/format, mypy nad 51 source soubory a 113 testů prošly; frontend lint/typecheck, 28 testů a production build prošly; Terraform validate a oba guardrail testy prošly. Přidán úzký `.gitattributes` guard pro Python `LF`, protože lokální `core.autocrlf=true` jinak porušoval explicitní Ruff konfiguraci.
-- Zbývá k uzavření M4-06: po commitu/pushi ověřit nový GitHub Actions CI workflow na pull requestu.
+- CI ověření a uzavření: PR #4 spustil GitHub Actions run `32650052383`; backend, frontend i Terraform job skončily zeleně. První run odhalil dvě portability mezery: partial GCS backend neměl deklarované prázdné klíče pro čistý `init -backend=false` a Linux nepovažoval `C:/private/data` za absolutní `Path`. Backend nyní nezávisle na host OS odmítá POSIX, Windows, UNC i traversal cesty a Terraform partial backend explicitně deklaruje `bucket`/`prefix`; opravný backend CI provedl i všech devět PostgreSQL integračních testů.
 - Dílčí pokračování 2026-08-22: zahájen aplikační wiring `M4-05`; API i scraper umějí přes validovanou konfiguraci používat společný produkční GCS bucket. Archiv obrázků je create-only, kontroluje CRC32C a magic header a odmítá konfliktní obsah; lokální backend zůstává výchozí pro vývoj a smoke testy.
 
 Při zahájení tasku sem zapsat:
@@ -135,6 +135,12 @@ Položka označená `[!]` musí zde uvést:
 - které další tasky blokuje.
 
 ## Historie dokončené práce
+
+### 2026-08-23 – `M4-06`
+
+- Terraformem je nasazen autorizovaný pondělní Scheduler v `03:00 Europe/Prague`, dedikovaná invoker identita a nejmenší custom role umožňující API pouze spuštění scraper jobu s per-execution override.
+- Owner-only trigger byl prakticky ověřen přes produkční session a CSRF: API service account vytvořil execution `sreality-tracker-scraper-nl62g`, která úspěšně zpracovala 3 583 nabídek bez chyby a korektně vyhodnotila nové, změněné i deaktivované nabídky.
+- GitHub Actions na PR #4 ověřuje Python 3.13/PostgreSQL 16, frontend Node 24 a Terraform 1.15. Finální run `32650052383` skončil třemi zelenými joby; kontrolovaný deployment a rollback popisuje produkční runbook.
 
 ### 2026-08-23 – `M4-04`
 
