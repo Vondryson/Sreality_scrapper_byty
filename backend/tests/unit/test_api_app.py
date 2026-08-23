@@ -164,9 +164,7 @@ def test_private_listing_write_requires_owner_identity() -> None:
     engine = create_engine("sqlite+pysqlite:///:memory:")
     app = create_app(settings=build_test_settings(), engine=engine)
 
-    response = asyncio.run(
-        patch_json(app, "/api/v1/listings/1/user-data", {"is_favorite": True})
-    )
+    response = asyncio.run(patch_json(app, "/api/v1/listings/1/user-data", {"is_favorite": True}))
 
     assert response.status_code == 401
     assert response.json() == {
@@ -187,9 +185,7 @@ def test_owner_session_and_csrf_are_enforced() -> None:
         )
     )
     assert denied.status_code == 401
-    [image_denied] = asyncio.run(
-        request_many(app, "/api/v1/listings/1/images/0/archive")
-    )
+    [image_denied] = asyncio.run(request_many(app, "/api/v1/listings/1/images/0/archive"))
     assert image_denied.status_code == 401
     assert valid.status_code == 200
     assert valid.json()["email"] == "owner@example.com"

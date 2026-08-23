@@ -43,8 +43,7 @@ def test_compute_routes_uses_minimal_essentials_contract_and_retries() -> None:
     assert sleeps == [0.5]
     assert all(str(request.url) == ROUTES_ENDPOINT for request in requests)
     assert all(
-        request.headers["x-goog-user-project"] == "sreality-scrapper-504307"
-        for request in requests
+        request.headers["x-goog-user-project"] == "sreality-scrapper-504307" for request in requests
     )
     assert all(
         request.headers["x-goog-fieldmask"] == "routes.distanceMeters,routes.duration"

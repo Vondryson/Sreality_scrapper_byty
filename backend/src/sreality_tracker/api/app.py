@@ -14,6 +14,7 @@ from sreality_tracker.api.auth import AuthManager, GoogleOAuthClient, SessionCod
 from sreality_tracker.api.auth_routes import router as auth_router
 from sreality_tracker.api.dependencies import AppContainer
 from sreality_tracker.api.errors import register_exception_handlers
+from sreality_tracker.api.job_trigger import cloud_run_job_trigger
 from sreality_tracker.api.listing_insights import router as listing_insights_router
 from sreality_tracker.api.listings import router as listings_router
 from sreality_tracker.api.operations import router as operations_router
@@ -21,10 +22,15 @@ from sreality_tracker.api.owner import require_owner
 from sreality_tracker.api.system import router as system_router
 from sreality_tracker.api.user_listing_service import ImageArchiver
 from sreality_tracker.api.user_listings import router as user_listings_router
-from sreality_tracker.core.settings import Settings, load_settings
+from sreality_tracker.core.settings import Settings, StorageBackend, load_settings
 from sreality_tracker.db.models import ScrapeRunTrigger
 from sreality_tracker.db.session import create_database_engine, create_session_factory
-from sreality_tracker.storage.images import HttpxImageFetcher, LocalImageArchiveStorage
+from sreality_tracker.storage.images import (
+    GcsImageArchiveStorage,
+    HttpxImageFetcher,
+    ImageArchiveStorage,
+    LocalImageArchiveStorage,
+)
 
 API_V1_PREFIX = "/api/v1"
 
@@ -48,9 +54,9 @@ def create_app(
         session_factory=create_session_factory(resolved_engine),
         readiness_probe=probe,
         owns_engine=owns_engine,
-        image_archiver=image_archiver or _local_image_archiver(resolved_settings),
+        image_archiver=image_archiver or _image_archiver(resolved_settings),
         auth_manager=auth_manager or _auth_manager(resolved_settings),
-        manual_scrape_trigger=manual_scrape_trigger or _local_manual_trigger(resolved_settings),
+        manual_scrape_trigger=manual_scrape_trigger or _manual_trigger(resolved_settings),
     )
 
     @asynccontextmanager
@@ -100,10 +106,19 @@ def _database_probe(engine: Engine) -> Callable[[], bool]:
     return probe
 
 
-def _local_image_archiver(settings: Settings) -> ImageArchiver:
+def _image_archiver(settings: Settings) -> ImageArchiver:
+    storage: ImageArchiveStorage
+    if settings.storage_backend is StorageBackend.GCS:
+        assert settings.storage_bucket is not None
+        storage = GcsImageArchiveStorage.from_bucket_name(
+            settings.storage_bucket,
+            project=settings.gcp_project_id,
+        )
+    else:
+        storage = LocalImageArchiveStorage(settings.raw_storage_path / "images")
     return ImageArchiver(
         fetcher=HttpxImageFetcher(timeout_seconds=settings.http_timeout_seconds),
-        storage=LocalImageArchiveStorage(settings.raw_storage_path / "images"),
+        storage=storage,
     )
 
 
@@ -125,9 +140,19 @@ def _auth_manager(settings: Settings) -> AuthManager | None:
     )
 
 
-def _local_manual_trigger(settings: Settings) -> Callable[[str], None] | None:
+def _manual_trigger(settings: Settings) -> Callable[[str], None] | None:
     if settings.environment.value == "production":
-        return None
+        if (
+            settings.gcp_project_id is None
+            or settings.cloud_run_region is None
+            or settings.scraper_job_name is None
+        ):
+            return None
+        return cloud_run_job_trigger(
+            project_id=settings.gcp_project_id,
+            region=settings.cloud_run_region,
+            job_name=settings.scraper_job_name,
+        )
 
     def trigger(logical_key: str) -> None:
         from sreality_tracker.scraper.cli import _run_pipeline

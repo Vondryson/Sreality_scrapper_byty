@@ -21,9 +21,7 @@ class OwnerIdentity:
 def require_owner(request: Request) -> OwnerIdentity:
     manager = request.app.state.container.auth_manager
     identity: OwnerIdentity | None = (
-        None
-        if manager is None
-        else manager.authenticate(request.cookies.get("sreality_session"))
+        None if manager is None else manager.authenticate(request.cookies.get("sreality_session"))
     )
     if identity is None:
         raise ApiError(status_code=401, code="authentication_required", message="Sign-in required")

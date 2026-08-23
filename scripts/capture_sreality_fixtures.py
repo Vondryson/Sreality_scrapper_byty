@@ -16,8 +16,8 @@ from typing import Any
 
 from scripts.validate_sreality_api import (
     CATEGORIES,
-    PageProbe,
     SITE_BASE_URL,
+    PageProbe,
     ValidationError,
     get_search_state,
     parse_next_data,
@@ -76,8 +76,7 @@ def sanitize_scalar(value: Any, key: str) -> Any:
 def sanitize(value: Any, key: str = "") -> Any:
     if isinstance(value, dict):
         return {
-            str(child_key): sanitize(child, str(child_key))
-            for child_key, child in value.items()
+            str(child_key): sanitize(child, str(child_key)) for child_key, child in value.items()
         }
     if isinstance(value, list):
         limit = 2 if key in {"results", "images", "nearest", "extendedPois", "videos"} else None
@@ -157,6 +156,8 @@ def fixture_meta(category_label: str, fixture_type: str) -> dict[str, Any]:
 
 def make_missing_optional_fixture(detail: dict[str, Any]) -> dict[str, Any]:
     edge = json.loads(json.dumps(detail))
+    if not isinstance(edge, dict):
+        raise ValidationError("Detail fixture is not an object")
     edge["fixture_meta"] = fixture_meta("chata", "detail_missing_optional")
     data = edge.get("data")
     if not isinstance(data, dict):

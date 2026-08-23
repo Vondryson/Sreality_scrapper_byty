@@ -8,7 +8,7 @@ Region: `europe-west1` (Belgie)
 
 Navržená architektura je technicky dostupná, ale s trvale běžícím Cloud SQL je rozpočet 200–300 Kč měsíčně velmi těsný. Kontrolovaný základní scénář vychází přibližně na **276 Kč/měsíc bez případné DPH**. Konzervativní scénář je přibližně **307 Kč/měsíc bez případné DPH**. Cloud SQL tvoří přibližně 98 % základního odhadu.
 
-Doporučení je pokračovat ve vývoji cloudově kompatibilní varianty, ale cloudové prostředky zatím nevytvářet. Před nasazením je nutné potvrdit billing cílového projektu, způsob účtování daně a cenu konfigurace v Google Cloud Pricing Calculatoru. Po nasazení má následovat jeden celý měřený fakturační měsíc; pokud run-rate přesáhne 300 Kč, aplikace přejde na lokální PostgreSQL, nebo uživatel explicitně schválí vyšší rozpočet.
+Dne 12. srpna 2026 uživatel schválil podmíněné cloudové pokračování s pracovním odhadem přibližně 276 Kč měsíčně bez případné DPH, upozorněními při 200/300 Kč a návratem na lokální PostgreSQL, pokud skutečný run-rate přesáhne 300 Kč. Po nasazení má následovat jeden celý měřený fakturační měsíc.
 
 Brána M0 zatím není uzavřena: projekt, billing a aktivované služby nebylo možné read-only ověřit kvůli lokální chybě důvěryhodnosti TLS při obnově OAuth tokenu `gcloud`. Aktivní `gcloud` účet i projekt navíc patří jinému pracovnímu prostředí, proto nebyla jejich konfigurace změněna.
 

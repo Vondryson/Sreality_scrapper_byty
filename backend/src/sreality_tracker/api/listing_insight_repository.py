@@ -305,9 +305,7 @@ def _append_observation_range(
 def _distance_expressions() -> tuple[Any, Any, Any]:
     return (
         _distance_value(ListingDistance.air_distance_km, LOCAL_PROVIDER, STRAIGHT_LINE_MODE),
-        _distance_value(
-            ListingDistance.road_distance_km, GOOGLE_ROUTES_PROVIDER, DRIVING_MODE
-        ),
+        _distance_value(ListingDistance.road_distance_km, GOOGLE_ROUTES_PROVIDER, DRIVING_MODE),
         _distance_value(
             ListingDistance.drive_duration_minutes, GOOGLE_ROUTES_PROVIDER, DRIVING_MODE
         ),

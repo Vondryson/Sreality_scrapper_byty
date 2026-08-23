@@ -70,9 +70,7 @@ def update_user_listing(
     )
 
 
-def _archive_listing_images(
-    session: Session, *, listing_id: int, archiver: ImageArchiver
-) -> None:
+def _archive_listing_images(session: Session, *, listing_id: int, archiver: ImageArchiver) -> None:
     images = session.scalars(
         select(ListingImage)
         .where(ListingImage.listing_id == listing_id)

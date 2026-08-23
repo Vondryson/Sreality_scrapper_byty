@@ -1,0 +1,67 @@
+name: sreality-m4-smoke
+
+services:
+  postgres:
+    image: postgres:16.10-alpine
+    environment:
+      POSTGRES_DB: sreality_tracker
+      POSTGRES_USER: sreality
+      POSTGRES_PASSWORD: smoke_only
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 2s
+      timeout: 3s
+      retries: 15
+      start_period: 5s
+    tmpfs:
+      - /var/lib/postgresql/data
+
+  backend:
+    image: sreality-backend:m4-smoke
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+      target: api
+    environment:
+      SREALITY_ENVIRONMENT: production
+      SREALITY_DATABASE_URL: postgresql+psycopg://sreality:smoke_only@postgres:5432/sreality_tracker
+      SREALITY_RAW_STORAGE_PATH: data/raw
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      interval: 2s
+      timeout: 3s
+      retries: 15
+      start_period: 5s
+  scraper:
+    image: sreality-scraper:m4-smoke
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+      target: scraper
+    environment:
+      SREALITY_ENVIRONMENT: production
+      SREALITY_DATABASE_URL: postgresql+psycopg://sreality:smoke_only@postgres:5432/sreality_tracker
+      SREALITY_RAW_STORAGE_PATH: data/raw
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  frontend:
+    image: sreality-frontend:m4-smoke
+    build:
+      context: frontend
+      dockerfile: Dockerfile
+      args:
+        SREALITY_BACKEND_URL: http://backend:8080
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:13000:8080"
+    healthcheck:
+      interval: 2s
+      timeout: 3s
+      retries: 15
+      start_period: 5s

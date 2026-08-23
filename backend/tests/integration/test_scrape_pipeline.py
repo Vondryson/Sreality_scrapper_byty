@@ -408,9 +408,7 @@ def test_pipeline_caches_routes_and_provider_failure_never_blocks_listing(tmp_pa
         )
         failure_result = ScrapePipeline(
             session_factory=factory,
-            source=FakeSource(
-                {ListingKind.CHATA: (new_chata,), ListingKind.CHALUPA: (chalupa,)}
-            ),
+            source=FakeSource({ListingKind.CHATA: (new_chata,), ListingKind.CHALUPA: (chalupa,)}),
             raw_storage=LocalRawStorage(tmp_path / "raw"),
             scraper_version="test-v1",
             road_distance_enricher=RoadDistanceEnricher(

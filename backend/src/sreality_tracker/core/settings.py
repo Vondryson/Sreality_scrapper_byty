@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from enum import StrEnum
-from pathlib import Path
+from pathlib import Path, PurePosixPath, PureWindowsPath
 from typing import Literal
 from urllib.parse import urlparse
 
@@ -17,6 +17,11 @@ class Environment(StrEnum):
     LOCAL = "local"
     TEST = "test"
     PRODUCTION = "production"
+
+
+class StorageBackend(StrEnum):
+    LOCAL = "local"
+    GCS = "gcs"
 
 
 class ConfigurationError(RuntimeError):
@@ -34,6 +39,9 @@ class Settings(BaseSettings):
 
     environment: Environment = Environment.LOCAL
     database_url: SecretStr
+    storage_backend: StorageBackend = StorageBackend.LOCAL
+    storage_bucket: str | None = None
+    gcp_project_id: str | None = None
     raw_storage_path: Path = Path("data/raw")
     log_level: Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"] = "INFO"
     http_timeout_seconds: float = Field(default=20.0, gt=0, le=120)
@@ -45,11 +53,11 @@ class Settings(BaseSettings):
     routes_access_token: SecretStr | None = None
     routes_daily_request_limit: int = Field(default=300, ge=1, le=300)
     routes_max_attempts: int = Field(default=3, ge=1, le=6)
+    cloud_run_region: str | None = None
+    scraper_job_name: str | None = None
     google_oauth_client_id: str | None = None
     google_oauth_client_secret: SecretStr | None = None
-    google_oauth_redirect_uri: str = (
-        "http://localhost:8000/api/v1/auth/google/callback"
-    )
+    google_oauth_redirect_uri: str = "http://localhost:8000/api/v1/auth/google/callback"
     frontend_url: str = "http://localhost:3000"
     owner_email: str | None = None
     session_secret: SecretStr | None = None
@@ -71,7 +79,16 @@ class Settings(BaseSettings):
     @field_validator("raw_storage_path")
     @classmethod
     def validate_relative_storage_path(cls, value: Path) -> Path:
-        if value.is_absolute() or ".." in value.parts:
+        raw_path = str(value)
+        posix_path = PurePosixPath(raw_path)
+        windows_path = PureWindowsPath(raw_path)
+        if (
+            posix_path.is_absolute()
+            or windows_path.is_absolute()
+            or bool(windows_path.drive)
+            or ".." in posix_path.parts
+            or ".." in windows_path.parts
+        ):
             raise ValueError("must be a relative path inside the project workspace")
         return value
 
@@ -120,6 +137,33 @@ class Settings(BaseSettings):
         local_http = redirect.scheme == "http" and redirect.hostname == "localhost"
         if redirect.scheme != "https" and not local_http:
             raise ValueError("OAuth redirect URI must use HTTPS or HTTP localhost")
+        return self
+
+    @model_validator(mode="after")
+    def validate_storage_backend(self) -> Settings:
+        if self.storage_backend is StorageBackend.LOCAL:
+            return self
+        if self.gcp_project_id != "sreality-scrapper-504307":
+            raise ValueError("GCS storage requires the approved GCP project")
+        if self.storage_bucket != "sreality-scrapper-504307-application-data":
+            raise ValueError("GCS storage requires the approved private application bucket")
+        return self
+
+    @model_validator(mode="after")
+    def validate_cloud_run_trigger(self) -> Settings:
+        values_present = (
+            self.cloud_run_region is not None,
+            self.scraper_job_name is not None,
+        )
+        if any(values_present) and not all(values_present):
+            raise ValueError("Cloud Run trigger requires region and scraper job name")
+        if self.cloud_run_region is not None and self.cloud_run_region != "europe-west1":
+            raise ValueError("Cloud Run trigger requires the approved region")
+        if (
+            self.scraper_job_name is not None
+            and self.scraper_job_name != "sreality-tracker-scraper"
+        ):
+            raise ValueError("Cloud Run trigger requires the managed scraper job")
         return self
 
 

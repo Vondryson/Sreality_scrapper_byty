@@ -4,7 +4,12 @@ from pathlib import Path
 
 import pytest
 
-from sreality_tracker.core.settings import ConfigurationError, Environment, load_settings
+from sreality_tracker.core.settings import (
+    ConfigurationError,
+    Environment,
+    StorageBackend,
+    load_settings,
+)
 
 DATABASE_URL = "postgresql+psycopg://sreality:sreality_local_only@localhost:5432/sreality_tracker"
 
@@ -24,6 +29,7 @@ def test_settings_load_valid_environment(monkeypatch: pytest.MonkeyPatch) -> Non
     settings = load_settings()
 
     assert settings.environment is Environment.TEST
+    assert settings.storage_backend is StorageBackend.LOCAL
     assert settings.database_url_value() == DATABASE_URL
     assert settings.raw_storage_path == Path("data/test-raw")
     assert settings.log_level == "WARNING"
@@ -53,7 +59,9 @@ def test_missing_database_url_fails_without_echoing_values(
     [
         ("SREALITY_DATABASE_URL", "sqlite:///secret-value.db", "postgresql+psycopg"),
         ("SREALITY_RAW_STORAGE_PATH", "C:/private/data", "relative path"),
+        ("SREALITY_RAW_STORAGE_PATH", r"\\server\share\data", "relative path"),
         ("SREALITY_RAW_STORAGE_PATH", "../outside", "relative path"),
+        ("SREALITY_RAW_STORAGE_PATH", r"..\outside", "relative path"),
         ("SREALITY_ROUTES_DAILY_REQUEST_LIMIT", "301", "less than or equal to 300"),
         ("SREALITY_FRONTEND_URL", "http://attacker.example/path", "HTTPS or HTTP localhost"),
     ],
@@ -88,3 +96,44 @@ def test_partial_oauth_configuration_and_short_session_secret_are_rejected(
     monkeypatch.setenv("SREALITY_SESSION_SECRET", "too-short")
     with pytest.raises(ConfigurationError, match="at least 32 bytes"):
         load_settings()
+
+
+def test_gcs_storage_requires_exact_approved_project_and_bucket(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("SREALITY_DATABASE_URL", DATABASE_URL)
+    monkeypatch.setenv("SREALITY_STORAGE_BACKEND", "gcs")
+    monkeypatch.setenv("SREALITY_GCP_PROJECT_ID", "wrong-project")
+    monkeypatch.setenv("SREALITY_STORAGE_BUCKET", "wrong-bucket")
+
+    with pytest.raises(ConfigurationError, match="approved GCP project"):
+        load_settings()
+
+    monkeypatch.setenv("SREALITY_GCP_PROJECT_ID", "sreality-scrapper-504307")
+    with pytest.raises(ConfigurationError, match="approved private application bucket"):
+        load_settings()
+
+    monkeypatch.setenv("SREALITY_STORAGE_BUCKET", "sreality-scrapper-504307-application-data")
+    settings = load_settings()
+
+    assert settings.storage_backend is StorageBackend.GCS
+    assert settings.gcp_project_id == "sreality-scrapper-504307"
+
+
+def test_cloud_run_trigger_requires_complete_managed_target(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("SREALITY_DATABASE_URL", DATABASE_URL)
+    monkeypatch.setenv("SREALITY_CLOUD_RUN_REGION", "europe-west1")
+    with pytest.raises(ConfigurationError, match="region and scraper job name"):
+        load_settings()
+
+    monkeypatch.setenv("SREALITY_SCRAPER_JOB_NAME", "untrusted-job")
+    with pytest.raises(ConfigurationError, match="managed scraper job"):
+        load_settings()
+
+    monkeypatch.setenv("SREALITY_SCRAPER_JOB_NAME", "sreality-tracker-scraper")
+    settings = load_settings()
+
+    assert settings.cloud_run_region == "europe-west1"
+    assert settings.scraper_job_name == "sreality-tracker-scraper"
