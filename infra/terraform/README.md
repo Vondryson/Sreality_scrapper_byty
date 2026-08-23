@@ -89,3 +89,6 @@ terraform init -backend=false
 terraform validate
 terraform test
 ```
+
+Produkční build, promotion immutable digestů, plán, rollback a ověření popisuje
+[deployment runbook](../../docs/runbooks/production-deployment.md).

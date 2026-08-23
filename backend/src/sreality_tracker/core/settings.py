@@ -53,6 +53,8 @@ class Settings(BaseSettings):
     routes_access_token: SecretStr | None = None
     routes_daily_request_limit: int = Field(default=300, ge=1, le=300)
     routes_max_attempts: int = Field(default=3, ge=1, le=6)
+    cloud_run_region: str | None = None
+    scraper_job_name: str | None = None
     google_oauth_client_id: str | None = None
     google_oauth_client_secret: SecretStr | None = None
     google_oauth_redirect_uri: str = "http://localhost:8000/api/v1/auth/google/callback"
@@ -136,6 +138,23 @@ class Settings(BaseSettings):
             raise ValueError("GCS storage requires the approved GCP project")
         if self.storage_bucket != "sreality-scrapper-504307-application-data":
             raise ValueError("GCS storage requires the approved private application bucket")
+        return self
+
+    @model_validator(mode="after")
+    def validate_cloud_run_trigger(self) -> Settings:
+        values_present = (
+            self.cloud_run_region is not None,
+            self.scraper_job_name is not None,
+        )
+        if any(values_present) and not all(values_present):
+            raise ValueError("Cloud Run trigger requires region and scraper job name")
+        if self.cloud_run_region is not None and self.cloud_run_region != "europe-west1":
+            raise ValueError("Cloud Run trigger requires the approved region")
+        if (
+            self.scraper_job_name is not None
+            and self.scraper_job_name != "sreality-tracker-scraper"
+        ):
+            raise ValueError("Cloud Run trigger requires the managed scraper job")
         return self
 
 

@@ -26,11 +26,14 @@ def archived_listing_image(
     request: Request,
 ) -> Response:
     object_key = session.scalar(
-        select(ListingImage.archive_object_key).where(
+        select(ListingImage.archive_object_key)
+        .where(
             ListingImage.listing_id == listing_id,
             ListingImage.position == position,
             ListingImage.archive_object_key.is_not(None),
-        ).order_by(ListingImage.id).limit(1)
+        )
+        .order_by(ListingImage.id)
+        .limit(1)
     )
     archiver: ImageArchiver | None = request.app.state.container.image_archiver
     if object_key is None or archiver is None:

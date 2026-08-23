@@ -6,6 +6,7 @@ import argparse
 import json
 import sys
 from collections.abc import Sequence
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import TextIO
 
@@ -41,8 +42,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     run_parser.add_argument(
         "--logical-key",
-        required=True,
-        help="unique idempotency key, for example manual:2026-08-11T1200",
+        help="unique idempotency key; defaults to <trigger>:<current UTC timestamp>",
     )
     run_parser.add_argument(
         "--trigger",
@@ -72,7 +72,11 @@ def main(argv: Sequence[str] | None = None) -> int:
             return 0 if backfill.failed == 0 else 1
         result = _run_pipeline(
             settings,
-            logical_key=str(args.logical_key),
+            logical_key=(
+                str(args.logical_key)
+                if args.logical_key is not None
+                else _generated_logical_key(ScrapeRunTrigger(str(args.trigger)))
+            ),
             trigger=ScrapeRunTrigger(str(args.trigger)),
         )
         _write_json(_result_payload(result))
@@ -95,6 +99,11 @@ def _check_database(settings: Settings) -> None:
             connection.execute(text("SELECT 1"))
     finally:
         engine.dispose()
+
+
+def _generated_logical_key(trigger: ScrapeRunTrigger) -> str:
+    timestamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%S%fZ")
+    return f"{trigger.value}:{timestamp}"
 
 
 def _run_pipeline(settings: Settings, *, logical_key: str, trigger: ScrapeRunTrigger) -> RunResult:

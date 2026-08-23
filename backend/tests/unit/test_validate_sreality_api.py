@@ -2,7 +2,6 @@ import json
 from typing import Any
 
 import pytest
-
 from scripts.validate_sreality_api import (
     CATEGORIES,
     NextDataParser,

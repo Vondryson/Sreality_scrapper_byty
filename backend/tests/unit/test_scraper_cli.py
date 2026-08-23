@@ -6,6 +6,7 @@ from types import SimpleNamespace
 import pytest
 
 from sreality_tracker.core.settings import ConfigurationError, StorageBackend
+from sreality_tracker.db.models import ScrapeRunStatus, ScrapeRunTrigger
 from sreality_tracker.scraper import cli
 
 
@@ -64,6 +65,44 @@ def test_routes_backfill_returns_usage_metric(
         "failed": 0,
         "provider_requests": 2,
     }
+
+
+def test_run_generates_unique_scheduled_logical_key(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    settings = SimpleNamespace(log_level="INFO")
+    captured: dict[str, object] = {}
+    result = SimpleNamespace(
+        status=ScrapeRunStatus.SUCCEEDED,
+        run_id="run-id",
+        logical_key="scheduled:generated",
+        found_count=0,
+        new_count=0,
+        changed_count=0,
+        error_count=0,
+        deactivated_count=0,
+        chata_complete=True,
+        chalupa_complete=True,
+    )
+    monkeypatch.setattr(cli, "load_settings", lambda: settings)
+    monkeypatch.setattr(
+        cli,
+        "_generated_logical_key",
+        lambda trigger: f"{trigger.value}:generated",
+    )
+
+    def run_pipeline(_settings: object, *, logical_key: str, trigger: ScrapeRunTrigger) -> object:
+        captured.update(logical_key=logical_key, trigger=trigger)
+        return result
+
+    monkeypatch.setattr(cli, "_run_pipeline", run_pipeline)
+
+    assert cli.main(["run", "--trigger", "scheduled"]) == 0
+    assert captured == {
+        "logical_key": "scheduled:generated",
+        "trigger": ScrapeRunTrigger.SCHEDULED,
+    }
+    assert json.loads(capsys.readouterr().out)["logical_key"] == "scheduled:generated"
 
 
 def test_raw_storage_selects_validated_gcs_bucket(monkeypatch: pytest.MonkeyPatch) -> None:

@@ -75,9 +75,7 @@ def test_non_allowlisted_google_account_is_denied() -> None:
 
 def test_session_rejects_tampering_expiry_and_wrong_purpose() -> None:
     codec = SessionCodec("s" * 32)
-    valid = codec.dumps(
-        {"purpose": "owner_session", "exp": int(time.time()) + 60, "email": "x"}
-    )
+    valid = codec.dumps({"purpose": "owner_session", "exp": int(time.time()) + 60, "email": "x"})
     with pytest.raises(AuthTokenError):
         codec.loads(valid + "tampered", purpose="owner_session")
     expired = codec.dumps({"purpose": "owner_session", "exp": int(time.time()) - 1})

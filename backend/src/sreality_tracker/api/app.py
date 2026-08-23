@@ -14,6 +14,7 @@ from sreality_tracker.api.auth import AuthManager, GoogleOAuthClient, SessionCod
 from sreality_tracker.api.auth_routes import router as auth_router
 from sreality_tracker.api.dependencies import AppContainer
 from sreality_tracker.api.errors import register_exception_handlers
+from sreality_tracker.api.job_trigger import cloud_run_job_trigger
 from sreality_tracker.api.listing_insights import router as listing_insights_router
 from sreality_tracker.api.listings import router as listings_router
 from sreality_tracker.api.operations import router as operations_router
@@ -55,7 +56,7 @@ def create_app(
         owns_engine=owns_engine,
         image_archiver=image_archiver or _image_archiver(resolved_settings),
         auth_manager=auth_manager or _auth_manager(resolved_settings),
-        manual_scrape_trigger=manual_scrape_trigger or _local_manual_trigger(resolved_settings),
+        manual_scrape_trigger=manual_scrape_trigger or _manual_trigger(resolved_settings),
     )
 
     @asynccontextmanager
@@ -139,9 +140,19 @@ def _auth_manager(settings: Settings) -> AuthManager | None:
     )
 
 
-def _local_manual_trigger(settings: Settings) -> Callable[[str], None] | None:
+def _manual_trigger(settings: Settings) -> Callable[[str], None] | None:
     if settings.environment.value == "production":
-        return None
+        if (
+            settings.gcp_project_id is None
+            or settings.cloud_run_region is None
+            or settings.scraper_job_name is None
+        ):
+            return None
+        return cloud_run_job_trigger(
+            project_id=settings.gcp_project_id,
+            region=settings.cloud_run_region,
+            job_name=settings.scraper_job_name,
+        )
 
     def trigger(logical_key: str) -> None:
         from sreality_tracker.scraper.cli import _run_pipeline

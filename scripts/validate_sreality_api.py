@@ -87,9 +87,10 @@ class PageProbe:
         self.delay_seconds = delay_seconds
         self.timeout_seconds = timeout_seconds
         self.request_count = 0
-        self.curl_path = shutil.which("curl")
-        if not self.curl_path:
+        curl_path = shutil.which("curl")
+        if curl_path is None:
             raise ValidationError("curl is required for the discovery probe")
+        self.curl_path = curl_path
 
     def get_html(self, url: str) -> str:
         if self.request_count:
@@ -216,8 +217,10 @@ def get_listing_ids(results: Any) -> list[str]:
 def get_codebook_value(value: Any, field: str) -> int:
     if isinstance(value, int):
         return value
-    if isinstance(value, dict) and isinstance(value.get("value"), int):
-        return value["value"]
+    if isinstance(value, dict):
+        nested = value.get("value")
+        if isinstance(nested, int):
+            return nested
     raise ValidationError(f"Search result has invalid {field} codebook value")
 
 
@@ -263,9 +266,7 @@ def extract_page(
             get_codebook_value(listing.get("categorySubCb"), "categorySubCb"),
         )
         if observed != (1, 2, category.subtype):
-            raise ValidationError(
-                f"Result category mismatch for {category.label}: {observed!r}"
-            )
+            raise ValidationError(f"Result category mismatch for {category.label}: {observed!r}")
 
     return {
         "build_id": next_data.get("buildId"),

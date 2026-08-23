@@ -30,3 +30,22 @@ variable "environment" {
     error_message = "This cost-constrained stack manages production only."
   }
 }
+
+variable "workload_images" {
+  description = "Immutable Artifact Registry image references used by the Cloud Run workloads; null bootstraps the registry only."
+  type = object({
+    api      = string
+    frontend = string
+    scraper  = string
+  })
+  default  = null
+  nullable = true
+
+  validation {
+    condition = var.workload_images == null || alltrue([
+      for image in values(var.workload_images) :
+      can(regex("^${var.region}-docker\\.pkg\\.dev/${var.project_id}/sreality-tracker/[a-z0-9-]+@sha256:[0-9a-f]{64}$", image))
+    ])
+    error_message = "Every workload image must be an immutable sha256 reference in the managed sreality-tracker repository."
+  }
+}

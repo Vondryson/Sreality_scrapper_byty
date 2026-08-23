@@ -11,7 +11,8 @@ import argparse
 import json
 import statistics
 import sys
-from collections import Counter, defaultdict
+from collections import Counter
+from collections.abc import Sequence
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -20,8 +21,8 @@ from urllib.parse import urlparse
 from scripts.capture_sreality_fixtures import find_detail_link, get_estate_data
 from scripts.validate_sreality_api import (
     CATEGORIES,
-    PageProbe,
     SITE_BASE_URL,
+    PageProbe,
     ValidationError,
     get_search_state,
     parse_next_data,
@@ -60,9 +61,7 @@ def image_variant_url(url: str) -> str:
     return f"{normalized}{separator}{IMAGE_TRANSFORMATION}"
 
 
-def observe_fields(
-    observations: dict[str, dict[str, Any]], mapping: dict[str, Any]
-) -> None:
+def observe_fields(observations: dict[str, dict[str, Any]], mapping: dict[str, Any]) -> None:
     for key, value in mapping.items():
         field = observations.setdefault(
             key,
@@ -74,9 +73,7 @@ def observe_fields(
         field["types"][type_name(value)] += 1
 
 
-def finalize_fields(
-    observations: dict[str, dict[str, Any]], sample_size: int
-) -> dict[str, Any]:
+def finalize_fields(observations: dict[str, dict[str, Any]], sample_size: int) -> dict[str, Any]:
     result: dict[str, Any] = {}
     for key in sorted(observations):
         field = observations[key]
@@ -90,7 +87,7 @@ def finalize_fields(
     return result
 
 
-def numeric_summary(values: list[int | float], sample_size: int) -> dict[str, Any]:
+def numeric_summary(values: Sequence[int | float], sample_size: int) -> dict[str, Any]:
     if not values:
         return {"observed": 0, "missing_or_non_numeric": sample_size}
     return {
@@ -108,9 +105,7 @@ def collect_numeric(mapping: dict[str, Any], key: str, target: list[int | float]
         target.append(value)
 
 
-def build_profile(
-    probe: PageProbe, sample_per_category: int
-) -> dict[str, Any]:
+def build_profile(probe: PageProbe, sample_per_category: int) -> dict[str, Any]:
     top_level_fields: dict[str, dict[str, Any]] = {}
     param_fields: dict[str, dict[str, Any]] = {}
     category_counts: Counter[str] = Counter()
@@ -135,9 +130,7 @@ def build_profile(
         if not isinstance(results, list):
             raise ValidationError(f"No result list for {category.label}")
 
-        selected = [item for item in results if isinstance(item, dict)][
-            :sample_per_category
-        ]
+        selected = [item for item in results if isinstance(item, dict)][:sample_per_category]
         if len(selected) < sample_per_category:
             raise ValidationError(f"Insufficient sample for {category.label}")
 
@@ -214,9 +207,7 @@ def build_profile(
             "count_per_listing": numeric_summary(image_counts, sampled_details),
             "declared_width": numeric_summary(image_widths, len(image_widths)),
             "declared_height": numeric_summary(image_heights, len(image_heights)),
-            "downloaded_file_bytes": numeric_summary(
-                image_download_sizes, sampled_details
-            ),
+            "downloaded_file_bytes": numeric_summary(image_download_sizes, sampled_details),
             "download_failures": image_download_failures,
             "measured_variant": "800x600 WebP quality 60 as rendered by the search page",
             "observed_domains": dict(sorted(image_domains.items())),

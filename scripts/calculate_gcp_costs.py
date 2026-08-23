@@ -10,7 +10,6 @@ import argparse
 import json
 from dataclasses import asdict, dataclass
 
-
 HOURS_PER_MONTH = 730.5
 SQL_COMPUTE_USD_PER_HOUR = 0.0105
 SQL_SSD_USD_PER_GIB_HOUR = 0.000465753
@@ -96,4 +95,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

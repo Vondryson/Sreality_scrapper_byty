@@ -2,12 +2,12 @@
 
 ## Aktuální stav
 
-- Poslední aktualizace: 2026-08-22
+- Poslední aktualizace: 2026-08-23
 - Aktuální milník: M4 – GCP infrastruktura a automatizovaný provoz
-- Aktuální hlavní task: `M4-02` – Založit Terraform state a základ projektu
-- Následující doporučený task: ověřit bootstrap a remote-state Terraform plan
+- Aktuální hlavní task: `M4-06` – Přidat Scheduler, ruční běh a CI/CD
+- Následující doporučený task: doplnit autorizovaný pondělní Scheduler, produkční ruční Cloud Run trigger a CI/deployment runbook
 - Blokátory: žádné
-- Souhrn: 33 dokončeno, 1 rozpracováno, 0 blokováno, 9 čeká
+- Souhrn: 36 dokončeno, 1 rozpracováno, 0 blokováno, 6 čeká
 
 ## Legenda
 
@@ -68,11 +68,11 @@ Najednou má být `[~]` označen nejvýše jeden hlavní task. Dílčí paraleln
 ## M4 – GCP infrastruktura a automatizovaný provoz
 
 - [x] `M4-01` – Připravit produkční Docker images.
-- [~] `M4-02` – Založit Terraform state a základ projektu.
-- [ ] `M4-03` – Vytvořit Cloud SQL, Storage a lifecycle.
-- [ ] `M4-04` – Vytvořit IAM, service accounts a secrets.
-- [ ] `M4-05` – Nasadit Cloud Run services a scraper job.
-- [ ] `M4-06` – Přidat Scheduler, ruční běh a CI/CD.
+- [x] `M4-02` – Založit Terraform state a základ projektu.
+- [x] `M4-03` – Vytvořit Cloud SQL, Storage a lifecycle.
+- [x] `M4-04` – Vytvořit IAM, service accounts a secrets.
+- [x] `M4-05` – Nasadit Cloud Run services a scraper job.
+- [~] `M4-06` – Přidat Scheduler, ruční běh a CI/CD.
 - [ ] `M4-07` – Přidat monitoring, e-mail a obnovu.
 - [ ] `M4-08` – Nastavit a ověřit rozpočtové pojistky.
 
@@ -84,15 +84,32 @@ Najednou má být `[~]` označen nejvýše jeden hlavní task. Dílčí paraleln
 
 ## Pracovní poznámky k aktivnímu tasku
 
-### 2026-08-12 – `M4-02`
+### 2026-08-23 – `M4-05`
 
-- Plán: oddělit bootstrap GCS state bucketu od hlavního modulu, připnout Terraform/provider verze, projekt, region, labels a bezpečné API enablement; ověřit formát, validaci a plány bez nečekaných destruktivních změn.
-- Rozsah: `infra/terraform`, remote backend konfigurace, state recovery pravidla a provozní README.
-- Rizika: state bucket musí vzniknout před inicializací GCS backendu; aplikovat lze pouze v osobním projektu `sreality-scrapper-504307`.
-- Předpoklad: uživatel 12. srpna 2026 schválil podmíněný cloudový provoz kolem 276 Kč měsíčně bez případné DPH, budget upozornění 200/300 Kč a lokální fallback nad 300 Kč.
-- Stav: oba Terraform moduly jsou validní v oficiálním Terraform 1.15.8 image; bootstrap plan obsahuje přesně `1 add, 0 change, 0 destroy`. Apply nevytvořil žádný prostředek, protože uložené ADC má neplatný refresh token a lokální gcloud token refresh blokuje Avast TLS inspekce. Pokračování čeká na nový interaktivní ADC login.
-- Dílčí pokračování 2026-08-22: připraven lokální základ `M4-03` pro zonální Cloud SQL, společný neveřejný aplikační bucket, 90denní raw lifecycle a mockované Terraform guardrail testy. Oficiální Terraform 1.15.8 Linux image potvrdil validní konfiguraci a `terraform test` prošel `1 passed, 0 failed`. Apply ani přechod hlavního tasku neproběhl, dokud není ověřen remote state.
-- Dílčí pokračování 2026-08-22: připraven lokální základ `M4-04` se třemi oddělenými runtime service accounts, nejmenšími Cloud SQL/Storage/Routes oprávněními a regionálními Secret Manager kontejnery bez secret verzí v Terraform state.
+- Plán: doplnit Artifact Registry, nasadit API a frontend jako Cloud Run services škálující na nulu a scraper jako Cloud Run job; připojit Cloud SQL socket, runtime identities, secrets a aplikační bucket.
+- Rozsah: produkční image promotion, Cloud Run v2 services/job, ingress a invoker hranice, health/startup probes, resource limity a provozní proměnné.
+- Stav: produkční Docker images, GCS wiring, runtime service accounts, IAM, Cloud SQL a pět aktivních secret verzí jsou připravené. Cloud Run Terraform zdroje a deployment postup zatím chybí.
+- Zbývá: navrhnout oddělený veřejný frontend a neveřejný API/job přístup, sestavit a pushnout image do Artifact Registry, aplikovat pouze zkontrolované M4-05 zdroje a prakticky ověřit health, autentizaci, DB i Storage.
+- Dílčí pokračování 2026-08-23: Terraform návrh přidává deletion-protected Artifact Registry s immutable tagy a cleanup pravidly, dvě Cloud Run v2 služby s `min=0`/`max=1` a jeden nerekurzivní scraper job s Cloud SQL socketem, GCS a vyhrazenými identitami. API transport zůstává dosažitelný pro browserový same-origin proxy, ale všechna aplikační data a provozní endpointy dál vynucují podepsanou owner session.
+- Ověření 2026-08-23: `terraform validate`, oba `terraform test` guardraily, cílené scraper CLI testy, Ruff i mypy prošly. Live plán s prázdnými image referencemi má přesně `1 add, 0 change, 0 destroy` a týká se pouze Artifact Registry; apply čeká na výslovné produkční schválení.
+- Produkční nasazení 2026-08-23: vznikl Artifact Registry `europe-west1-docker.pkg.dev/sreality-scrapper-504307/sreality-tracker`, API a frontend Cloud Run service a neveřejný scraper job. Finální služby používají immutable image digesty, deletion protection a scale-to-zero; následný Terraform drift check hlásí `No changes`.
+- Produkční smoke test 2026-08-23: frontend, frontendový API proxy, API liveness i databázová readiness vracejí `200`; anonymní listings vracejí `401`. Read-only scraper execution `sreality-tracker-scraper-55l2n` přes vlastní identitu, Secret Manager a Cloud SQL skončila úspěšně. OAuth login vrací `302` na `accounts.google.com` a nastaví podepsanou flow cookie.
+- Uzavření M4-05: produkční redirect URI byla přidána do OAuth web klienta a vlastník prakticky potvrdil úspěšné Google přihlášení. Plný scraper běh a jeho plánování patří do M4-06.
+
+### 2026-08-23 – `M4-06`
+
+- Plán: přidat dedikovanou Scheduler identitu a autorizovaný pondělní trigger v `03:00 Europe/Prague`, zapojit owner-only API endpoint na per-execution Cloud Run job override a zavést CI s kontrolovaným deployment runbookem.
+- Stav: Cloud Run scraper job je Ready a read-only execution je ověřená; produkční API zatím ruční trigger záměrně nenabízí a repozitář nemá CI workflow.
+- Dílčí implementace: API adaptér používá ADC a Cloud Run v2 per-execution override, target i logical key jsou allowlistované. Terraform přidává Scheduler service account, job-level invoker pro Scheduler a custom roli API omezenou přesně na `run.jobs.run` + `run.jobs.runWithOverrides`; Scheduler má `0 3 * * 1`, `Europe/Prague` a nulový retry count.
+- CI a dokumentace: nový GitHub Actions workflow testuje Python 3.13 s PostgreSQL 16, frontend na Node 24 a Terraform 1.15; deployment runbook vyžaduje immutable digesty, uložený plán, ruční kontrolu a popisuje rollback.
+- Ověření: Ruff, mypy (51 source files), 113 backend testů, 28 frontend testů, Next production build, `terraform validate` a oba Terraform guardrail testy prošly. Live plán M4-06 obsahuje přesně `5 add, 1 change, 0 destroy`; apply čeká na výslovné produkční schválení.
+- Produkční apply: po vypnutí Avastu proběhl plán přesně `5 add, 1 change, 0 destroy`. Scheduler `sreality-tracker-weekly` je `ENABLED`, používá `0 3 * * 1` a `Europe/Prague`; Scheduler service agent i dedikovaný invoker binding jsou přítomné. API liveness/readiness vracejí `200` a anonymní listings `401`.
+- IAM ověření: job policy váže API pouze na custom roli s přesně `run.jobs.run` a `run.jobs.runWithOverrides`; Scheduler má pouze `roles/run.invoker`. Osobní účet záměrně nemá Token Creator a API impersonace proto bezpečně selhala. Policy Troubleshooter API nebylo kvůli testu dodatečně zapnuto.
+- Drift: explicitní nulový `retry_config` blok byl odstraněn, protože Cloud Scheduler API používá stejné výchozí hodnoty, ale prázdný blok nevrací. Terraform guardrail zůstává a závěrečný plán hlásí `No changes`.
+- Produkční plný běh 2026-08-23: po výslovném souhlasu byl kvůli nedostupné sdílené browser session spuštěn přímo Cloud Run Job s manuálním logical key. Execution `sreality-tracker-scraper-cnzxd` skončila úspěšně za 25 min 34 s bez retry; run `d50dd841-57c2-49d1-be53-802e408e8d23` uložil 3 580 nabídek (`new=3580`, `changed=0`, `errors=0`, `deactivated=0`) a obě kategorie označil jako kompletní. Raw payload každé nabídky je přítomný v GCS.
+- Owner-trigger ověření 2026-08-23: přihlášená produkční session s platným CSRF tokenem dostala `202` a vytvořila run `6562af34-8e02-4b77-aee4-d9e681563d5b`. Execution `sreality-tracker-scraper-nl62g` vytvořila přímo API service account přes omezenou custom roli a skončila úspěšně za 14 min 13 s; výsledek byl `found=3583`, `new=7`, `changed=15`, `deactivated=4`, `errors=0`, obě kategorie kompletní. Tím je prakticky ověřen celý tok browser session/CSRF → API → Cloud Run Job → Cloud SQL/GCS.
+- Předcommitové CI ověření: backend Ruff check/format, mypy nad 51 source soubory a 113 testů prošly; frontend lint/typecheck, 28 testů a production build prošly; Terraform validate a oba guardrail testy prošly. Přidán úzký `.gitattributes` guard pro Python `LF`, protože lokální `core.autocrlf=true` jinak porušoval explicitní Ruff konfiguraci.
+- Zbývá k uzavření M4-06: po commitu/pushi ověřit nový GitHub Actions CI workflow na pull requestu.
 - Dílčí pokračování 2026-08-22: zahájen aplikační wiring `M4-05`; API i scraper umějí přes validovanou konfiguraci používat společný produkční GCS bucket. Archiv obrázků je create-only, kontroluje CRC32C a magic header a odmítá konfliktní obsah; lokální backend zůstává výchozí pro vývoj a smoke testy.
 
 Při zahájení tasku sem zapsat:
@@ -118,6 +135,27 @@ Položka označená `[!]` musí zde uvést:
 - které další tasky blokuje.
 
 ## Historie dokončené práce
+
+### 2026-08-23 – `M4-04`
+
+- Terraform po výslovném schválení vytvořil přesně 21 zdrojů: tři oddělené runtime service accounts, tři nejmenší project IAM granty, čtyři bucket object granty bez mazání, pět regionálních Secret Manager kontejnerů a šest explicitních accessor vazeb. Cílený post-apply plán hlásí `No changes`.
+- V databázi vznikla role `sreality_app` bez superuser/createdb/createrole/replication oprávnění; má pouze connect, schema usage, DML nad aplikačními tabulkami a práci se sekvencemi. Přihlášení a čtení tabulky `listings` byly prakticky ověřené.
+- Přes Secret Manager API bylo mimo Terraform state vloženo přesně pět verzí `1`: produkční Cloud SQL socket URL, OAuth client ID/secret, owner e-mail a session secret. Všechny mají stav `ENABLED`; hodnoty nebyly vypsané ani zapsané do repozitáře.
+- Avast Web Shield musel být dočasně vypnut, protože nahrazoval připnutý Cloud SQL certifikát. Podepsaný proxy proces i všechny dočasné soubory byly po běhu odstraněné.
+
+### 2026-08-23 – `M4-03`
+
+- Terraform vytvořil zonální PostgreSQL 16 `db-f1-micro`, databázi `sreality_tracker` a neveřejný regionální bucket `sreality-scrapper-504307-application-data`; cílený post-apply plán hlásí `No changes`.
+- SQL instance má 10GiB SSD s limitem 15 GiB, sedm denních záloh, connector enforcement a dvojitou deletion protection. Bucket má public access prevention, sedmidenní soft delete a 90denní lifecycle omezený na `raw/`.
+- Mockovaný guardrail test prošel `1 passed, 0 failed`. Podepsaný Windows Cloud SQL Auth Proxy 2.25.3 ověřil spojení přes `SELECT 1` a Alembic úspěšně aplikoval `20260811_0001 (head)`.
+- Avast Web Shield původně nahrazoval připnutý Cloud SQL certifikát na portu 3307; po jeho dočasném vypnutí proběhla migrace standardním TLS bez vlastního CA override. Proxy i dočasné soubory byly po běhu odstraněny.
+
+### 2026-08-23 – `M4-02`
+
+- Bootstrap vytvořil chráněný regionální bucket `sreality-scrapper-504307-tfstate` s uniform access, public access prevention, versioningem a lifecycle starších verzí; následný bootstrap plán byl čistý.
+- Hlavní modul používá GCS backend s prefixem `production`. Terraform state obsahuje 14 explicitně spravovaných základních API v projektu `sreality-scrapper-504307`; cílený post-apply plán hlásí `No changes`.
+- Každý apply předcházela strojová kontrola JSON plánu. Bootstrap provedl přesně `1 add, 0 change, 0 destroy`, API enablement přesně `14 add, 0 change, 0 destroy`; pozdější M4 zdroje bezpečnostní kontrola neaplikovala.
+- Avast TLS inspekce byla obsloužena připojením jejího root CA pouze do Terraform kontejneru; ověřování TLS nebylo vypnuto a dočasné certifikáty byly po běhu odstraněny.
 
 ### 2026-08-12 – `M4-01`
 

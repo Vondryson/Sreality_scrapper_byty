@@ -116,3 +116,22 @@ def test_gcs_storage_requires_exact_approved_project_and_bucket(
 
     assert settings.storage_backend is StorageBackend.GCS
     assert settings.gcp_project_id == "sreality-scrapper-504307"
+
+
+def test_cloud_run_trigger_requires_complete_managed_target(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("SREALITY_DATABASE_URL", DATABASE_URL)
+    monkeypatch.setenv("SREALITY_CLOUD_RUN_REGION", "europe-west1")
+    with pytest.raises(ConfigurationError, match="region and scraper job name"):
+        load_settings()
+
+    monkeypatch.setenv("SREALITY_SCRAPER_JOB_NAME", "untrusted-job")
+    with pytest.raises(ConfigurationError, match="managed scraper job"):
+        load_settings()
+
+    monkeypatch.setenv("SREALITY_SCRAPER_JOB_NAME", "sreality-tracker-scraper")
+    settings = load_settings()
+
+    assert settings.cloud_run_region == "europe-west1"
+    assert settings.scraper_job_name == "sreality-tracker-scraper"

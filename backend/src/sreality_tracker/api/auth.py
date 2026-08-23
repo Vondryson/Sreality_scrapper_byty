@@ -149,9 +149,7 @@ class SessionCodec:
     def loads(self, token: str, *, purpose: str) -> dict[str, Any]:
         try:
             encoded, supplied_signature = token.split(".", 1)
-            expected_signature = _base64url(
-                hmac.digest(self._secret, encoded.encode(), "sha256")
-            )
+            expected_signature = _base64url(hmac.digest(self._secret, encoded.encode(), "sha256"))
             if not hmac.compare_digest(supplied_signature, expected_signature):
                 raise AuthTokenError("session signature is invalid")
             payload = json.loads(_decode_base64url(encoded))

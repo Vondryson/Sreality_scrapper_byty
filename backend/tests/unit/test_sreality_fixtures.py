@@ -54,4 +54,3 @@ def test_missing_optional_fixture_exercises_absent_and_null_values() -> None:
     assert data["estateArea"] is None
     for key in ("note", "images", "matterportUrl", "panorama", "seller", "videos"):
         assert key not in data
-
