@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from enum import StrEnum
-from pathlib import Path
+from pathlib import Path, PurePosixPath, PureWindowsPath
 from typing import Literal
 from urllib.parse import urlparse
 
@@ -79,7 +79,16 @@ class Settings(BaseSettings):
     @field_validator("raw_storage_path")
     @classmethod
     def validate_relative_storage_path(cls, value: Path) -> Path:
-        if value.is_absolute() or ".." in value.parts:
+        raw_path = str(value)
+        posix_path = PurePosixPath(raw_path)
+        windows_path = PureWindowsPath(raw_path)
+        if (
+            posix_path.is_absolute()
+            or windows_path.is_absolute()
+            or bool(windows_path.drive)
+            or ".." in posix_path.parts
+            or ".." in windows_path.parts
+        ):
             raise ValueError("must be a relative path inside the project workspace")
         return value
 
