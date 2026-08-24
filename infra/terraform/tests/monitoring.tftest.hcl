@@ -85,9 +85,12 @@ run "keeps_monitoring_actionable_and_bounded" {
     condition = (
       !strcontains(google_monitoring_dashboard.operations.dashboard_json, "\"x\":") &&
       !strcontains(google_monitoring_dashboard.operations.dashboard_json, "\"y\":") &&
+      !strcontains(google_monitoring_dashboard.operations.dashboard_json, "\"xPos\":0") &&
+      !strcontains(google_monitoring_dashboard.operations.dashboard_json, "\"yPos\":0") &&
       strcontains(google_monitoring_dashboard.operations.dashboard_json, "\"xPos\":") &&
-      strcontains(google_monitoring_dashboard.operations.dashboard_json, "\"yPos\":")
+      strcontains(google_monitoring_dashboard.operations.dashboard_json, "\"yPos\":") &&
+      strcontains(google_monitoring_dashboard.operations.dashboard_json, "\"targetAxis\":\"Y1\"")
     )
-    error_message = "Mosaic tiles must use the API's xPos/yPos fields, never unsupported x/y fields."
+    error_message = "Dashboard JSON must match API-normalized positions and target axes."
   }
 }

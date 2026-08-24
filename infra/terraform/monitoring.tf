@@ -317,8 +317,6 @@ resource "google_monitoring_dashboard" "operations" {
       columns = 12
       tiles = [
         {
-          xPos   = 0
-          yPos   = 0
           width  = 6
           height = 4
           widget = {
@@ -326,7 +324,8 @@ resource "google_monitoring_dashboard" "operations" {
             xyChart = {
               dataSets = [
                 for metric_name in ["scrape-successes", "scrape-failures"] : {
-                  plotType = "LINE"
+                  plotType   = "LINE"
+                  targetAxis = "Y1"
                   timeSeriesQuery = {
                     timeSeriesFilter = {
                       filter = "resource.type=\"cloud_run_job\" AND metric.type=\"logging.googleapis.com/user/${google_logging_metric.scraper_counter[metric_name].name}\""
@@ -347,14 +346,14 @@ resource "google_monitoring_dashboard" "operations" {
         },
         {
           xPos   = 6
-          yPos   = 0
           width  = 6
           height = 4
           widget = {
             title = "Run duration (p95)"
             xyChart = {
               dataSets = [{
-                plotType = "LINE"
+                plotType   = "LINE"
+                targetAxis = "Y1"
                 timeSeriesQuery = {
                   timeSeriesFilter = {
                     filter = "resource.type=\"cloud_run_job\" AND metric.type=\"logging.googleapis.com/user/${google_logging_metric.scraper_run_distribution["duration-seconds"].name}\""
@@ -373,7 +372,6 @@ resource "google_monitoring_dashboard" "operations" {
           }
         },
         {
-          xPos   = 0
           yPos   = 4
           width  = 12
           height = 4
@@ -382,7 +380,8 @@ resource "google_monitoring_dashboard" "operations" {
             xyChart = {
               dataSets = [
                 for metric_name in ["found-count", "new-count", "changed-count", "deactivated-count", "error-count"] : {
-                  plotType = "LINE"
+                  plotType   = "LINE"
+                  targetAxis = "Y1"
                   timeSeriesQuery = {
                     timeSeriesFilter = {
                       filter = "resource.type=\"cloud_run_job\" AND metric.type=\"logging.googleapis.com/user/${google_logging_metric.scraper_run_distribution[metric_name].name}\""
@@ -402,7 +401,6 @@ resource "google_monitoring_dashboard" "operations" {
           }
         },
         {
-          xPos   = 0
           yPos   = 8
           width  = 6
           height = 4
@@ -411,7 +409,8 @@ resource "google_monitoring_dashboard" "operations" {
             xyChart = {
               dataSets = [
                 for metric_name in ["sreality-http-retries", "routes-requests", "routes-retries"] : {
-                  plotType = "LINE"
+                  plotType   = "LINE"
+                  targetAxis = "Y1"
                   timeSeriesQuery = {
                     timeSeriesFilter = {
                       filter = "resource.type=\"cloud_run_job\" AND metric.type=\"logging.googleapis.com/user/${google_logging_metric.scraper_counter[metric_name].name}\""
@@ -440,7 +439,8 @@ resource "google_monitoring_dashboard" "operations" {
             xyChart = {
               dataSets = [
                 for metric_type in ["cpu/utilization", "disk/utilization"] : {
-                  plotType = "LINE"
+                  plotType   = "LINE"
+                  targetAxis = "Y1"
                   timeSeriesQuery = {
                     timeSeriesFilter = {
                       filter = "resource.type=\"cloudsql_database\" AND metric.type=\"cloudsql.googleapis.com/database/${metric_type}\""
@@ -460,7 +460,6 @@ resource "google_monitoring_dashboard" "operations" {
           }
         },
         {
-          xPos   = 0
           yPos   = 12
           width  = 12
           height = 4
@@ -469,7 +468,8 @@ resource "google_monitoring_dashboard" "operations" {
             xyChart = {
               dataSets = [
                 for metric_type in ["total_bytes", "object_count"] : {
-                  plotType = "LINE"
+                  plotType   = "LINE"
+                  targetAxis = "Y1"
                   timeSeriesQuery = {
                     timeSeriesFilter = {
                       filter = "resource.type=\"gcs_bucket\" AND resource.labels.bucket_name=\"${google_storage_bucket.application_data.name}\" AND metric.type=\"storage.googleapis.com/storage/${metric_type}\""

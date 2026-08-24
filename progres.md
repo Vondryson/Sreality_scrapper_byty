@@ -97,6 +97,7 @@ Najednou má být `[~]` označen nejvýše jeden hlavní task. Dílčí paraleln
 - První apply 2026-08-24: Cloud Run job, nový scraper digest, všech 13 log-based metrik a e-mailový kanál byly vytvořeny. Google API odmítlo zbývající čtyři metric-threshold alerty kvůli nepovolenému `notification_rate_limit` a dashboard kvůli nepodporovaným `x`/`y` souřadnicím mosaic tiles; žádný destroy ani replace neproběhl.
 - První oprava: rate-limit bloky a nepodporovaná `x`/`y` pole byly odstraněny a oba případy dostaly regresní Terraform guardrail. `terraform validate` a všechny tři testovací sady po opravě znovu prošly.
 - Druhý apply: všechny čtyři alert policies byly vytvořeny. Dashboard bez pozic API odmítlo kvůli překryvu tiles; kontrakt vyžaduje pole `xPos`/`yPos` (původní `x`/`y` jsou neplatná). Poslední oprava i guardrail se týkají už pouze dashboardu.
+- Dashboard apply: dashboard byl vytvořen, následný drift check ale odhalil API normalizaci výchozí osy `targetAxis=Y1` a vynechávání nulových `xPos`/`yPos`. Deklarace byla srovnána s vraceným kontraktem; serverová `name`/`etag` pole provider podle svého JSON diff pravidla ignoruje, jakmile nezůstává jiná věcná změna.
 
 ### 2026-08-23 – `M4-05`
 
