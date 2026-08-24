@@ -104,3 +104,14 @@ Produkční build, promotion immutable digestů, plán, rollback a ověření po
 [deployment runbook](../../docs/runbooks/production-deployment.md).
 Zálohy, izolovanou obnovu a důkazní checklist popisuje
 [Cloud SQL restore runbook](../../docs/runbooks/cloud-sql-restore.md).
+
+## Rozpočtové pojistky
+
+Kořenový modul spravuje měsíční budget 300 Kč s upozorněními při skutečné útratě
+200 a 300 Kč, projektovou denní kvótu 300 požadavků `ComputeRoutes` a 30denní
+retenci bucketu `_Default`. Budget je upozornění, nikoli tvrdý limit účtování.
+
+Routes override i `_Default` bucket existovaly před přidáním do Terraformu. Před
+prvním M4-08 apply se proto musí importovat do remote state; bez importu se plán
+nesmí aplikovat. Přesné identifikátory, kontrola plánu a pravidelný cost audit jsou
+v [runbooku rozpočtových pojistek](../../docs/runbooks/cost-controls.md).

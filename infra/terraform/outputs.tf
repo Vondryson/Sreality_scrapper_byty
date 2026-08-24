@@ -93,3 +93,14 @@ output "monitoring" {
     minimum_expected_listing_count = var.minimum_expected_listing_count
   }
 }
+
+output "cost_controls" {
+  description = "Production budget, external API quota, and log-retention guardrails."
+  value = {
+    billing_budget_name        = google_billing_budget.production.name
+    budget_amount_czk          = local.monthly_budget_czk
+    budget_alert_amounts_czk   = local.budget_alert_amounts_czk
+    routes_daily_request_cap   = local.routes_daily_request_quota
+    default_log_retention_days = google_logging_project_bucket_config.default.retention_days
+  }
+}

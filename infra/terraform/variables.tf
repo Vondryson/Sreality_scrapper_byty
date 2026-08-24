@@ -50,6 +50,17 @@ variable "workload_images" {
   }
 }
 
+variable "billing_account_id" {
+  description = "Billing account attached to the dedicated personal project; the identifier is not a credential."
+  type        = string
+  default     = "019FD9-252204-7DCB11"
+
+  validation {
+    condition     = var.billing_account_id == "019FD9-252204-7DCB11"
+    error_message = "This stack may only manage the approved personal billing account."
+  }
+}
+
 variable "monitoring_email" {
   description = "Optional e-mail address for scraper incident alerts; set explicitly for production."
   type        = string

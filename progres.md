@@ -4,10 +4,10 @@
 
 - Poslední aktualizace: 2026-08-24
 - Aktuální milník: M4 – GCP infrastruktura a automatizovaný provoz
-- Aktuální hlavní task: žádný – `M4-07` je uzavřeno
-- Následující doporučený task: `M4-08` – Nastavit a ověřit rozpočtové pojistky
+- Aktuální hlavní task: žádný – `M4-08` je uzavřeno
+- Následující doporučený task: `M5-01` – Ověřit první kompletní produkční běh
 - Blokátory: žádné
-- Souhrn: 38 dokončeno, 0 rozpracováno, 0 blokováno, 5 čeká
+- Souhrn: 39 dokončeno, 0 rozpracováno, 0 blokováno, 4 čekají
 
 ## Legenda
 
@@ -74,7 +74,7 @@ Najednou má být `[~]` označen nejvýše jeden hlavní task. Dílčí paraleln
 - [x] `M4-05` – Nasadit Cloud Run services a scraper job.
 - [x] `M4-06` – Přidat Scheduler, ruční běh a CI/CD.
 - [x] `M4-07` – Přidat monitoring, e-mail a obnovu.
-- [ ] `M4-08` – Nastavit a ověřit rozpočtové pojistky.
+- [x] `M4-08` – Nastavit a ověřit rozpočtové pojistky.
 
 ## M5 – End-to-end validace a předání MVP
 
@@ -83,6 +83,18 @@ Najednou má být `[~]` označen nejvýše jeden hlavní task. Dílčí paraleln
 - [ ] `M5-03` – Uzavřít MVP checklist a provozní dokumentaci.
 
 ## Pracovní poznámky k aktivnímu tasku
+
+### 2026-08-24 – `M4-08`
+
+- Plán: deklarativně nastavit billing budget upozornění při 200/300 Kč, denní Routes kvótu 300 požadavků, 30denní retenci výchozího log bucketu a doložit aktuální run-rate po službách.
+- Rozsah: Terraform cost controls a jejich guardrail testy, import existujícího `_Default` log bucketu, produkční cost-audit postup a aktualizace provozní dokumentace.
+- Rizika a předpoklady: budget alert není tvrdý limit; billing budget vyžaduje oprávnění na připojeném billing accountu; `_Default` bucket musí být před apply bezpečně importovaný do state; skutečné náklady po službách lze potvrdit až z Billing reportu po dostatečně dlouhém měřeném období.
+- Inventura: aktivní osobní účet a projekt jsou správné, billing account `019FD9-252204-7DCB11` je otevřený a používá CZK. Routes `ComputeRoutes` již má effective limit 300 požadavků za den a `_Default` bucket již drží 30denní retenci.
+- Implementace: Terraform přidává chráněný měsíční budget 300 Kč s `CURRENT_SPEND` prahy 200/300 Kč a ověřeným monitoring e-mailem, přebírá Routes override a `_Default` bucket, připíná beta provider 7.41.0 a dokumentuje run-rate 275,58 Kč bez DPH (konzervativně 306,55 Kč).
+- Import: oba existující guardraily byly úspěšně převzaté do verzovaného remote state bez změny cloudových hodnot. První post-import plán odhalil odlišnou API normalizaci project identifierů a byl zamítnut kvůli dvěma replace akcím; deklarace i regresní test byly opravené.
+- Ověření: `terraform fmt -check -recursive`, `terraform validate` a všechny čtyři guardrail testy procházejí. Finální strojově zkontrolovaný plán má přesně `2 add, 2 in-place change, 0 destroy`: zapnutí Budget API, nový budget a pouze state-side ochranu dvou importovaných zdrojů.
+- Produkční apply: schválený plán nejprve zapnul Budget API a ochránil oba importované guardraily, ale budget bezpečně selhal bez vytvoření kvůli chybnému ADC consumer projektu. `billing_project` je nyní explicitní součástí obou Google providerů; retry plán obsahoval pouze `1 add, 0 change, 0 destroy` a budget vytvořil.
+- Uzavření: budget `eeb8e184-511a-4b9a-b00d-fe83d7be17de` je v CZK, omezený na projekt `545468906541`, má `CURRENT_SPEND` prahy přesně 200/300 Kč a používá ověřený e-mailový kanál. Read-only API kontroly potvrzují Routes limit 300/den a retenci logů 30 dní; závěrečný Terraform drift check hlásí `No changes`.
 
 ### 2026-08-23 – `M4-07`
 

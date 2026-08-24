@@ -2,6 +2,10 @@ mock_provider "google" {
   override_during = plan
 }
 
+mock_provider "google-beta" {
+  override_during = plan
+}
+
 variables {
   monitoring_email = "owner@example.com"
   workload_images = {

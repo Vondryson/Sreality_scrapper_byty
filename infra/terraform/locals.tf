@@ -1,5 +1,6 @@
 locals {
-  name_prefix = "sreality-tracker"
+  name_prefix    = "sreality-tracker"
+  project_number = "545468906541"
 
   labels = {
     application = "sreality-tracker"
@@ -7,8 +8,14 @@ locals {
     managed_by  = "terraform"
   }
 
+  monthly_budget_czk         = 300
+  budget_alert_amounts_czk   = [200, 300]
+  routes_daily_request_quota = 300
+  default_log_retention_days = 30
+
   required_services = toset([
     "artifactregistry.googleapis.com",
+    "billingbudgets.googleapis.com",
     "cloudresourcemanager.googleapis.com",
     "cloudscheduler.googleapis.com",
     "compute.googleapis.com",
