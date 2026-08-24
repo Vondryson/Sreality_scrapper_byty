@@ -2,12 +2,12 @@
 
 ## Aktuální stav
 
-- Poslední aktualizace: 2026-08-23
+- Poslední aktualizace: 2026-08-24
 - Aktuální milník: M4 – GCP infrastruktura a automatizovaný provoz
-- Aktuální hlavní task: žádný – `M4-06` je uzavřeno
-- Následující doporučený task: `M4-07` – Přidat monitoring, e-mail a obnovu
+- Aktuální hlavní task: žádný – `M4-08` je uzavřeno
+- Následující doporučený task: `M5-01` – Ověřit první kompletní produkční běh
 - Blokátory: žádné
-- Souhrn: 37 dokončeno, 0 rozpracováno, 0 blokováno, 6 čeká
+- Souhrn: 39 dokončeno, 0 rozpracováno, 0 blokováno, 4 čekají
 
 ## Legenda
 
@@ -73,8 +73,8 @@ Najednou má být `[~]` označen nejvýše jeden hlavní task. Dílčí paraleln
 - [x] `M4-04` – Vytvořit IAM, service accounts a secrets.
 - [x] `M4-05` – Nasadit Cloud Run services a scraper job.
 - [x] `M4-06` – Přidat Scheduler, ruční běh a CI/CD.
-- [ ] `M4-07` – Přidat monitoring, e-mail a obnovu.
-- [ ] `M4-08` – Nastavit a ověřit rozpočtové pojistky.
+- [x] `M4-07` – Přidat monitoring, e-mail a obnovu.
+- [x] `M4-08` – Nastavit a ověřit rozpočtové pojistky.
 
 ## M5 – End-to-end validace a předání MVP
 
@@ -83,6 +83,36 @@ Najednou má být `[~]` označen nejvýše jeden hlavní task. Dílčí paraleln
 - [ ] `M5-03` – Uzavřít MVP checklist a provozní dokumentaci.
 
 ## Pracovní poznámky k aktivnímu tasku
+
+### 2026-08-24 – `M4-08`
+
+- Plán: deklarativně nastavit billing budget upozornění při 200/300 Kč, denní Routes kvótu 300 požadavků, 30denní retenci výchozího log bucketu a doložit aktuální run-rate po službách.
+- Rozsah: Terraform cost controls a jejich guardrail testy, import existujícího `_Default` log bucketu, produkční cost-audit postup a aktualizace provozní dokumentace.
+- Rizika a předpoklady: budget alert není tvrdý limit; billing budget vyžaduje oprávnění na připojeném billing accountu; `_Default` bucket musí být před apply bezpečně importovaný do state; skutečné náklady po službách lze potvrdit až z Billing reportu po dostatečně dlouhém měřeném období.
+- Inventura: aktivní osobní účet a projekt jsou správné, billing account `019FD9-252204-7DCB11` je otevřený a používá CZK. Routes `ComputeRoutes` již má effective limit 300 požadavků za den a `_Default` bucket již drží 30denní retenci.
+- Implementace: Terraform přidává chráněný měsíční budget 300 Kč s `CURRENT_SPEND` prahy 200/300 Kč a ověřeným monitoring e-mailem, přebírá Routes override a `_Default` bucket, připíná beta provider 7.41.0 a dokumentuje run-rate 275,58 Kč bez DPH (konzervativně 306,55 Kč).
+- Import: oba existující guardraily byly úspěšně převzaté do verzovaného remote state bez změny cloudových hodnot. První post-import plán odhalil odlišnou API normalizaci project identifierů a byl zamítnut kvůli dvěma replace akcím; deklarace i regresní test byly opravené.
+- Ověření: `terraform fmt -check -recursive`, `terraform validate` a všechny čtyři guardrail testy procházejí. Finální strojově zkontrolovaný plán má přesně `2 add, 2 in-place change, 0 destroy`: zapnutí Budget API, nový budget a pouze state-side ochranu dvou importovaných zdrojů.
+- Produkční apply: schválený plán nejprve zapnul Budget API a ochránil oba importované guardraily, ale budget bezpečně selhal bez vytvoření kvůli chybnému ADC consumer projektu. `billing_project` je nyní explicitní součástí obou Google providerů; retry plán obsahoval pouze `1 add, 0 change, 0 destroy` a budget vytvořil.
+- Uzavření: budget `eeb8e184-511a-4b9a-b00d-fe83d7be17de` je v CZK, omezený na projekt `545468906541`, má `CURRENT_SPEND` prahy přesně 200/300 Kč a používá ověřený e-mailový kanál. Read-only API kontroly potvrzují Routes limit 300/den a retenci logů 30 dní; závěrečný Terraform drift check hlásí `No changes`.
+
+### 2026-08-23 – `M4-07`
+
+- Plán: sjednotit měřitelné scraper události, přidat log-based metriky/dashboard a e-mailové alerty, potvrdit 30denní retenci logů a zdokumentovat bezpečný Cloud SQL restore drill.
+- Rozsah: aplikační JSON logy pro výsledek/délku/počty/retry/Routes/storage, Terraform Monitoring a Logging zdroje, notification channel, alert policies a recovery runbook.
+- Rizika a předpoklady: e-mailový kanál může vyžadovat potvrzení příjemce; absence a propadové alerty musí zabránit falešným poplachům; restore se nesmí provádět přes produkční instanci a případný placený drill bude vyžadovat samostatné produkční schválení.
+- Implementace: scraper emituje jednotný výsledek, délku, počty, category completion a HTTP/Routes retry události; produkční práh podezřelého poklesu je 2 500 nabídek. Terraform přidává 13 log-based metrik, provozní dashboard, e-mailový kanál a čtyři alert policies pro aplikační/platformní selhání, propad počtu a zaplnění Cloud SQL.
+- Obnova: Cloud SQL nadále drží sedm denních záloh a nový runbook obnovuje pouze do samostatné dočasné instance s read-only datovou kontrolou; placený praktický drill zůstává explicitně v `M5-02`.
+- Lokální ověření: Ruff, mypy, 117 backend testů (11 integračních/live korektně přeskočeno), `terraform validate` a všechny tři Terraform guardrail testy prošly. Zbývá nový scraper image, kontrolovaný produkční plán/apply, potvrzení e-mailového kanálu a praktický test incidentu.
+- Produkční plán: při trvale nastaveném příjemci v ignorovaném `workloads.auto.tfvars` obsahuje přesně `19 add, 1 in-place change, 0 destroy`; jediná změna existujícího zdroje přidává scraper jobu práh 2 500. Uložený plán se nesmí aplikovat před promotion nového scraper image digestu a opakovanou kontrolou plánu.
+- Schválení 2026-08-24: vlastník schválil commit/push, promotion nového scraper image a produkční apply pouze při zachování přesně `19 add, 1 in-place change, 0 destroy`.
+- První apply 2026-08-24: Cloud Run job, nový scraper digest, všech 13 log-based metrik a e-mailový kanál byly vytvořeny. Google API odmítlo zbývající čtyři metric-threshold alerty kvůli nepovolenému `notification_rate_limit` a dashboard kvůli nepodporovaným `x`/`y` souřadnicím mosaic tiles; žádný destroy ani replace neproběhl.
+- První oprava: rate-limit bloky a nepodporovaná `x`/`y` pole byly odstraněny a oba případy dostaly regresní Terraform guardrail. `terraform validate` a všechny tři testovací sady po opravě znovu prošly.
+- Druhý apply: všechny čtyři alert policies byly vytvořeny. Dashboard bez pozic API odmítlo kvůli překryvu tiles; kontrakt vyžaduje pole `xPos`/`yPos` (původní `x`/`y` jsou neplatná). Poslední oprava i guardrail se týkají už pouze dashboardu.
+- Dashboard apply: dashboard byl vytvořen, následný drift check ale odhalil API normalizaci výchozí osy `targetAxis=Y1` a vynechávání nulových `xPos`/`yPos`. Deklarace byla srovnána s vraceným kontraktem; serverová `name`/`etag` pole provider podle svého JSON diff pravidla ignoruje, jakmile nezůstává jiná věcná změna.
+- Finální produkční stav: nový scraper image `sha256:4fd885185625f23e9f0443942dfb5ee985a4c427825c73165c708ff1a46b8dab`, práh 2 500, všech 13 metrik, čtyři aktivní alert policies, e-mailový kanál a dashboard jsou nasazené. Terraform po normalizaci dashboard JSON hlásí `No changes`.
+- Provozní ověření: read-only execution `sreality-tracker-scraper-kls56` na novém image skončila `succeededCount=1` a emitovala `status=ready, mode=read_only`. Syntetická událost `monitoring:test:20260824-01` dorazila do správného `cloud_run_job` logu a failure metrika vrací hodnotu `1`; čeká se pouze na potvrzení skutečného doručení e-mailu vlastníkem.
+- Uzavření: vlastník potvrdil doručení e-mailu z policy `Sreality scraper: unsuccessful run` pro metriku `logging.googleapis.com/user/sreality-tracker-scrape-failures`, job `sreality-tracker-scraper` a syntetický log `sreality-monitoring-test`. Celý incidentní řetězec je tím prakticky ověřený a `M4-07` je dokončeno; rozpočty, kvóty a 30denní retence pokračují v `M4-08`.
 
 ### 2026-08-23 – `M4-05`
 

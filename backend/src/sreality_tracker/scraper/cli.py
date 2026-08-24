@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+import time
 from collections.abc import Sequence
 from datetime import UTC, datetime
 from pathlib import Path
@@ -70,6 +71,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             backfill = _run_routes_backfill(settings, limit=int(args.limit))
             _write_json(_backfill_payload(backfill))
             return 0 if backfill.failed == 0 else 1
+        started_at = time.monotonic()
         result = _run_pipeline(
             settings,
             logical_key=(
@@ -79,14 +81,23 @@ def main(argv: Sequence[str] | None = None) -> int:
             ),
             trigger=ScrapeRunTrigger(str(args.trigger)),
         )
-        _write_json(_result_payload(result))
+        _write_json(
+            _result_payload(
+                result,
+                duration_seconds=max(0.0, time.monotonic() - started_at),
+                minimum_expected_listing_count=settings.monitoring_minimum_listing_count,
+            )
+        )
         return 0 if result.status is ScrapeRunStatus.SUCCEEDED else 1
     except ConfigurationError:
-        _write_json({"status": "error", "error_type": "ConfigurationError"}, stream=sys.stderr)
+        _write_json(
+            _error_payload(command=args.command, error_type="ConfigurationError"),
+            stream=sys.stderr,
+        )
         return 2
     except Exception as error:
         _write_json(
-            {"status": "error", "error_type": type(error).__name__},
+            _error_payload(command=args.command, error_type=type(error).__name__),
             stream=sys.stderr,
         )
         return 1
@@ -151,18 +162,38 @@ def _raw_storage(settings: Settings) -> RawStorage:
     return LocalRawStorage(Path.cwd() / settings.raw_storage_path)
 
 
-def _result_payload(result: RunResult) -> dict[str, object]:
+def _result_payload(
+    result: RunResult,
+    *,
+    duration_seconds: float,
+    minimum_expected_listing_count: int,
+) -> dict[str, object]:
     return {
+        "event": "scrape_run_completed",
         "status": result.status.value,
         "run_id": str(result.run_id),
         "logical_key": result.logical_key,
+        "duration_seconds": round(duration_seconds, 3),
         "found_count": result.found_count,
+        "listing_count_below_threshold": (
+            result.status is ScrapeRunStatus.SUCCEEDED
+            and result.found_count < minimum_expected_listing_count
+        ),
         "new_count": result.new_count,
         "changed_count": result.changed_count,
         "error_count": result.error_count,
         "deactivated_count": result.deactivated_count,
         "chata_complete": result.chata_complete,
         "chalupa_complete": result.chalupa_complete,
+    }
+
+
+def _error_payload(*, command: str, error_type: str) -> dict[str, object]:
+    return {
+        "event": "scrape_run_failed" if command == "run" else "command_failed",
+        "status": "error",
+        "command": command,
+        "error_type": error_type,
     }
 
 

@@ -9,7 +9,25 @@ from datetime import UTC, datetime
 from typing import Any, TextIO
 
 LOGGER_NAME = "sreality_tracker"
-CONTEXT_FIELDS = ("event", "step", "run_id", "listing_id", "error_type")
+CONTEXT_FIELDS = (
+    "event",
+    "step",
+    "run_id",
+    "listing_id",
+    "error_type",
+    "status",
+    "trigger",
+    "kind",
+)
+METRIC_FIELDS = (
+    "duration_seconds",
+    "found_count",
+    "new_count",
+    "changed_count",
+    "error_count",
+    "deactivated_count",
+    "provider_requests",
+)
 REDACTED = "[REDACTED]"
 _URL_PASSWORD = re.compile(r"(?P<prefix>://[^:/\s]+:)[^@\s]+@")
 _KEY_VALUE_SECRET = re.compile(
@@ -41,6 +59,10 @@ class JsonFormatter(logging.Formatter):
             value = getattr(record, field, None)
             if value is not None:
                 payload[field] = str(value)
+        for field in METRIC_FIELDS:
+            value = getattr(record, field, None)
+            if isinstance(value, (int, float)) and not isinstance(value, bool):
+                payload[field] = value
         if record.exc_info is not None and record.exc_info[0] is not None:
             payload["exception_type"] = record.exc_info[0].__name__
         return json.dumps(payload, ensure_ascii=False, separators=(",", ":"))

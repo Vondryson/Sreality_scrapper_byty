@@ -8,9 +8,16 @@ from sreality_tracker.distances.air import Coordinates
 from sreality_tracker.distances.routes import ROUTES_ENDPOINT, RoutesClient, RoutesError
 
 
-def test_compute_routes_uses_minimal_essentials_contract_and_retries() -> None:
+def test_compute_routes_uses_minimal_essentials_contract_and_retries(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     requests: list[httpx.Request] = []
     statuses = iter([503, 200])
+    retry_events: list[dict[str, str]] = []
+    monkeypatch.setattr(
+        "sreality_tracker.distances.routes.logger.warning",
+        lambda _message, *, extra: retry_events.append(extra),
+    )
 
     def handler(request: httpx.Request) -> httpx.Response:
         requests.append(request)
@@ -41,6 +48,7 @@ def test_compute_routes_uses_minimal_essentials_contract_and_retries() -> None:
     assert result.duration_seconds == Decimal(8233)
     assert client.request_count == 2
     assert sleeps == [0.5]
+    assert retry_events == [{"event": "routes_retry", "step": "_RetryableRoutesError"}]
     assert all(str(request.url) == ROUTES_ENDPOINT for request in requests)
     assert all(
         request.headers["x-goog-user-project"] == "sreality-scrapper-504307" for request in requests

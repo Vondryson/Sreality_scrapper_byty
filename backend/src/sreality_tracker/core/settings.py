@@ -53,6 +53,7 @@ class Settings(BaseSettings):
     routes_access_token: SecretStr | None = None
     routes_daily_request_limit: int = Field(default=300, ge=1, le=300)
     routes_max_attempts: int = Field(default=3, ge=1, le=6)
+    monitoring_minimum_listing_count: int = Field(default=2500, ge=1, le=10000)
     cloud_run_region: str | None = None
     scraper_job_name: str | None = None
     google_oauth_client_id: str | None = None

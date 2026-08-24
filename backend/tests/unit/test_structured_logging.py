@@ -29,6 +29,27 @@ def test_json_log_contains_operational_context() -> None:
     assert payload["listing_id"] == "456"
 
 
+def test_json_log_preserves_allowlisted_numeric_metrics() -> None:
+    stream = StringIO()
+    logger = configure_logging(level="INFO", stream=stream)
+
+    logger.info(
+        "Category completed",
+        extra={
+            "event": "category_scrape_completed",
+            "kind": "chata",
+            "found_count": 2401,
+            "duration_seconds": 12.345,
+        },
+    )
+
+    payload = json.loads(stream.getvalue())
+    assert payload["event"] == "category_scrape_completed"
+    assert payload["kind"] == "chata"
+    assert payload["found_count"] == 2401
+    assert payload["duration_seconds"] == 12.345
+
+
 def test_log_message_and_exception_redact_secrets() -> None:
     stream = StringIO()
     logger = configure_logging(level="ERROR", stream=stream)

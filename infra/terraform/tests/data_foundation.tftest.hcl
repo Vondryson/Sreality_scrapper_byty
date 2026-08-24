@@ -2,6 +2,10 @@ mock_provider "google" {
   override_during = plan
 }
 
+mock_provider "google-beta" {
+  override_during = plan
+}
+
 run "keeps_data_foundation_within_mvp_guardrails" {
   command = plan
 

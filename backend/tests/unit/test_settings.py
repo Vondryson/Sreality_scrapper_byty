@@ -35,6 +35,7 @@ def test_settings_load_valid_environment(monkeypatch: pytest.MonkeyPatch) -> Non
     assert settings.log_level == "WARNING"
     assert settings.routes_project_id == "sreality-scrapper-504307"
     assert settings.routes_access_token_value() == "short-lived-secret-token"
+    assert settings.monitoring_minimum_listing_count == 2500
     assert settings.google_oauth_client_id == "test-client.apps.googleusercontent.com"
     assert settings.owner_email == "owner@example.com"
     assert "sreality_local_only" not in repr(settings)
@@ -63,6 +64,7 @@ def test_missing_database_url_fails_without_echoing_values(
         ("SREALITY_RAW_STORAGE_PATH", "../outside", "relative path"),
         ("SREALITY_RAW_STORAGE_PATH", r"..\outside", "relative path"),
         ("SREALITY_ROUTES_DAILY_REQUEST_LIMIT", "301", "less than or equal to 300"),
+        ("SREALITY_MONITORING_MINIMUM_LISTING_COUNT", "0", "greater than or equal to 1"),
         ("SREALITY_FRONTEND_URL", "http://attacker.example/path", "HTTPS or HTTP localhost"),
     ],
 )
