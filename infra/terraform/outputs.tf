@@ -74,3 +74,22 @@ output "scheduler" {
     service_account_email = google_service_account.scheduler[0].email
   }
 }
+
+output "monitoring" {
+  description = "Monitoring resources; alert channels and policies are created only when monitoring_email is set."
+  value = {
+    dashboard_id = google_monitoring_dashboard.operations.id
+    email_channel = (
+      var.monitoring_email == null
+      ? null
+      : google_monitoring_notification_channel.email[0].name
+    )
+    alert_policy_names = var.monitoring_email == null ? [] : [
+      google_monitoring_alert_policy.scraper_application_failure[0].name,
+      google_monitoring_alert_policy.scraper_platform_failure[0].name,
+      google_monitoring_alert_policy.suspicious_listing_count[0].name,
+      google_monitoring_alert_policy.cloud_sql_disk[0].name,
+    ]
+    minimum_expected_listing_count = var.minimum_expected_listing_count
+  }
+}

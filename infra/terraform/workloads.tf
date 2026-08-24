@@ -295,6 +295,10 @@ resource "google_cloud_run_v2_job" "scraper" {
           value = google_storage_bucket.application_data.name
         }
         env {
+          name  = "SREALITY_MONITORING_MINIMUM_LISTING_COUNT"
+          value = tostring(var.minimum_expected_listing_count)
+        }
+        env {
           name = "SREALITY_DATABASE_URL"
           value_source {
             secret_key_ref {

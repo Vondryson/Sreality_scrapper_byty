@@ -2,12 +2,12 @@
 
 ## Aktuální stav
 
-- Poslední aktualizace: 2026-08-23
+- Poslední aktualizace: 2026-08-24
 - Aktuální milník: M4 – GCP infrastruktura a automatizovaný provoz
-- Aktuální hlavní task: žádný – `M4-06` je uzavřeno
-- Následující doporučený task: `M4-07` – Přidat monitoring, e-mail a obnovu
+- Aktuální hlavní task: `M4-07` – Přidat monitoring, e-mail a obnovu
+- Následující doporučený task: commit/push, immutable scraper image a schválený produkční M4-07 apply
 - Blokátory: žádné
-- Souhrn: 37 dokončeno, 0 rozpracováno, 0 blokováno, 6 čeká
+- Souhrn: 37 dokončeno, 1 rozpracováno, 0 blokováno, 5 čeká
 
 ## Legenda
 
@@ -73,7 +73,7 @@ Najednou má být `[~]` označen nejvýše jeden hlavní task. Dílčí paraleln
 - [x] `M4-04` – Vytvořit IAM, service accounts a secrets.
 - [x] `M4-05` – Nasadit Cloud Run services a scraper job.
 - [x] `M4-06` – Přidat Scheduler, ruční běh a CI/CD.
-- [ ] `M4-07` – Přidat monitoring, e-mail a obnovu.
+- [~] `M4-07` – Přidat monitoring, e-mail a obnovu.
 - [ ] `M4-08` – Nastavit a ověřit rozpočtové pojistky.
 
 ## M5 – End-to-end validace a předání MVP
@@ -83,6 +83,17 @@ Najednou má být `[~]` označen nejvýše jeden hlavní task. Dílčí paraleln
 - [ ] `M5-03` – Uzavřít MVP checklist a provozní dokumentaci.
 
 ## Pracovní poznámky k aktivnímu tasku
+
+### 2026-08-23 – `M4-07`
+
+- Plán: sjednotit měřitelné scraper události, přidat log-based metriky/dashboard a e-mailové alerty, potvrdit 30denní retenci logů a zdokumentovat bezpečný Cloud SQL restore drill.
+- Rozsah: aplikační JSON logy pro výsledek/délku/počty/retry/Routes/storage, Terraform Monitoring a Logging zdroje, notification channel, alert policies a recovery runbook.
+- Rizika a předpoklady: e-mailový kanál může vyžadovat potvrzení příjemce; absence a propadové alerty musí zabránit falešným poplachům; restore se nesmí provádět přes produkční instanci a případný placený drill bude vyžadovat samostatné produkční schválení.
+- Implementace: scraper emituje jednotný výsledek, délku, počty, category completion a HTTP/Routes retry události; produkční práh podezřelého poklesu je 2 500 nabídek. Terraform přidává 13 log-based metrik, provozní dashboard, e-mailový kanál a čtyři alert policies pro aplikační/platformní selhání, propad počtu a zaplnění Cloud SQL.
+- Obnova: Cloud SQL nadále drží sedm denních záloh a nový runbook obnovuje pouze do samostatné dočasné instance s read-only datovou kontrolou; placený praktický drill zůstává explicitně v `M5-02`.
+- Lokální ověření: Ruff, mypy, 117 backend testů (11 integračních/live korektně přeskočeno), `terraform validate` a všechny tři Terraform guardrail testy prošly. Zbývá nový scraper image, kontrolovaný produkční plán/apply, potvrzení e-mailového kanálu a praktický test incidentu.
+- Produkční plán: při trvale nastaveném příjemci v ignorovaném `workloads.auto.tfvars` obsahuje přesně `19 add, 1 in-place change, 0 destroy`; jediná změna existujícího zdroje přidává scraper jobu práh 2 500. Uložený plán se nesmí aplikovat před promotion nového scraper image digestu a opakovanou kontrolou plánu.
+- Schválení 2026-08-24: vlastník schválil commit/push, promotion nového scraper image a produkční apply pouze při zachování přesně `19 add, 1 in-place change, 0 destroy`.
 
 ### 2026-08-23 – `M4-05`
 

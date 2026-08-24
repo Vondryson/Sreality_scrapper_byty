@@ -105,6 +105,16 @@ class SrealityListingSource:
 
             page_number += 1
 
+        self._logger.info(
+            "Sreality category scrape completed",
+            extra={
+                "event": "category_scrape_completed",
+                "step": "complete",
+                "kind": kind.value,
+                "found_count": len(seen_ids),
+            },
+        )
+
 
 def _detail_from_search(search: SearchListing, *, source_url: str) -> ListingDetail:
     """Build a deliberately incomplete detail when public detail SSR is unavailable."""

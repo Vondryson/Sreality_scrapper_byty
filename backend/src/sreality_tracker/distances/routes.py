@@ -120,6 +120,13 @@ class RoutesClient:
                 last_error = error
                 if attempt == self._max_attempts:
                     break
+                logger.warning(
+                    "Retrying Google Routes request",
+                    extra={
+                        "event": "routes_retry",
+                        "step": type(error).__name__,
+                    },
+                )
                 delay = self._backoff_base_seconds * (2 ** (attempt - 1))
                 delay += self._random_uniform(0.0, self._jitter_max_seconds)
                 self._sleep(delay)

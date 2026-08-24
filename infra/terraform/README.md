@@ -35,6 +35,16 @@ terraform plan -out production.tfplan
 Plán před aplikací musí být ručně zkontrolovaný; neočekávané `destroy` nebo `replace`
 akce znamenají zastavit a zjistit příčinu.
 
+Produkční alerty se zapnou pouze při explicitně zadaném příjemci. E-mail není
+secret, ale není natvrdo uložený v repozitáři:
+
+```powershell
+terraform plan -var 'monitoring_email=owner@example.com' -out production.tfplan
+```
+
+Po prvním apply musí příjemce potvrdit ověřovací zprávu Google Cloud Monitoring.
+Bez potvrzení může být kanál vytvořený, ale upozornění nemusí dorazit.
+
 ## Datový základ
 
 Kořenový modul vytváří jednu zonální PostgreSQL 16 instanci a jeden regionální
@@ -92,3 +102,5 @@ terraform test
 
 Produkční build, promotion immutable digestů, plán, rollback a ověření popisuje
 [deployment runbook](../../docs/runbooks/production-deployment.md).
+Zálohy, izolovanou obnovu a důkazní checklist popisuje
+[Cloud SQL restore runbook](../../docs/runbooks/cloud-sql-restore.md).

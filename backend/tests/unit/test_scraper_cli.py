@@ -70,7 +70,7 @@ def test_routes_backfill_returns_usage_metric(
 def test_run_generates_unique_scheduled_logical_key(
     monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
 ) -> None:
-    settings = SimpleNamespace(log_level="INFO")
+    settings = SimpleNamespace(log_level="INFO", monitoring_minimum_listing_count=2500)
     captured: dict[str, object] = {}
     result = SimpleNamespace(
         status=ScrapeRunStatus.SUCCEEDED,
@@ -90,6 +90,8 @@ def test_run_generates_unique_scheduled_logical_key(
         "_generated_logical_key",
         lambda trigger: f"{trigger.value}:generated",
     )
+    monotonic_values = iter([10.0, 22.3456])
+    monkeypatch.setattr(cli.time, "monotonic", lambda: next(monotonic_values))
 
     def run_pipeline(_settings: object, *, logical_key: str, trigger: ScrapeRunTrigger) -> object:
         captured.update(logical_key=logical_key, trigger=trigger)
@@ -102,7 +104,11 @@ def test_run_generates_unique_scheduled_logical_key(
         "logical_key": "scheduled:generated",
         "trigger": ScrapeRunTrigger.SCHEDULED,
     }
-    assert json.loads(capsys.readouterr().out)["logical_key"] == "scheduled:generated"
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["event"] == "scrape_run_completed"
+    assert payload["logical_key"] == "scheduled:generated"
+    assert payload["duration_seconds"] == 12.346
+    assert payload["listing_count_below_threshold"] is True
 
 
 def test_raw_storage_selects_validated_gcs_bucket(monkeypatch: pytest.MonkeyPatch) -> None:

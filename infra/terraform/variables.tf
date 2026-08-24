@@ -49,3 +49,33 @@ variable "workload_images" {
     error_message = "Every workload image must be an immutable sha256 reference in the managed sreality-tracker repository."
   }
 }
+
+variable "monitoring_email" {
+  description = "Optional e-mail address for scraper incident alerts; set explicitly for production."
+  type        = string
+  default     = null
+  nullable    = true
+
+  validation {
+    condition = (
+      var.monitoring_email == null ||
+      can(regex("^[^@[:space:]]+@[^@[:space:]]+\\.[^@[:space:]]+$", var.monitoring_email))
+    )
+    error_message = "monitoring_email must be null or a valid normalized e-mail address."
+  }
+}
+
+variable "minimum_expected_listing_count" {
+  description = "Successful full scraper runs below this listing count are treated as suspicious."
+  type        = number
+  default     = 2500
+
+  validation {
+    condition = (
+      var.minimum_expected_listing_count >= 1 &&
+      var.minimum_expected_listing_count <= 10000 &&
+      floor(var.minimum_expected_listing_count) == var.minimum_expected_listing_count
+    )
+    error_message = "minimum_expected_listing_count must be a whole number between 1 and 10000."
+  }
+}

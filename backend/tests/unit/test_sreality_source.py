@@ -145,3 +145,12 @@ def test_source_uses_search_data_after_detail_consent_redirect() -> None:
     assert fetched[0].detail.description is None
     assert fetched[0].detail.params == {}
     logger.warning.assert_called_once()
+    logger.info.assert_called_once_with(
+        "Sreality category scrape completed",
+        extra={
+            "event": "category_scrape_completed",
+            "step": "complete",
+            "kind": "chata",
+            "found_count": 2,
+        },
+    )
