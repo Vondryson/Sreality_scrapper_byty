@@ -94,6 +94,8 @@ Najednou má být `[~]` označen nejvýše jeden hlavní task. Dílčí paraleln
 - Lokální ověření: Ruff, mypy, 117 backend testů (11 integračních/live korektně přeskočeno), `terraform validate` a všechny tři Terraform guardrail testy prošly. Zbývá nový scraper image, kontrolovaný produkční plán/apply, potvrzení e-mailového kanálu a praktický test incidentu.
 - Produkční plán: při trvale nastaveném příjemci v ignorovaném `workloads.auto.tfvars` obsahuje přesně `19 add, 1 in-place change, 0 destroy`; jediná změna existujícího zdroje přidává scraper jobu práh 2 500. Uložený plán se nesmí aplikovat před promotion nového scraper image digestu a opakovanou kontrolou plánu.
 - Schválení 2026-08-24: vlastník schválil commit/push, promotion nového scraper image a produkční apply pouze při zachování přesně `19 add, 1 in-place change, 0 destroy`.
+- První apply 2026-08-24: Cloud Run job, nový scraper digest, všech 13 log-based metrik a e-mailový kanál byly vytvořeny. Google API odmítlo zbývající čtyři metric-threshold alerty kvůli nepovolenému `notification_rate_limit` a dashboard kvůli nepodporovaným `x`/`y` souřadnicím mosaic tiles; žádný destroy ani replace neproběhl.
+- Oprava: rate-limit bloky byly odstraněny, mosaic tiles používají automatické umístění a oba případy mají regresní Terraform guardrail. `terraform validate` a všechny tři testovací sady po opravě znovu prošly; zbývá aplikovat pouze pět dosud nevytvořených zdrojů a ověřit drift.
 
 ### 2026-08-23 – `M4-05`
 

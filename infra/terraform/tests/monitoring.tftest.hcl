@@ -53,6 +53,16 @@ run "keeps_monitoring_actionable_and_bounded" {
   }
 
   assert {
+    condition = alltrue([
+      length(google_monitoring_alert_policy.scraper_application_failure[0].alert_strategy[0].notification_rate_limit) == 0,
+      length(google_monitoring_alert_policy.scraper_platform_failure[0].alert_strategy[0].notification_rate_limit) == 0,
+      length(google_monitoring_alert_policy.suspicious_listing_count[0].alert_strategy[0].notification_rate_limit) == 0,
+      length(google_monitoring_alert_policy.cloud_sql_disk[0].alert_strategy[0].notification_rate_limit) == 0,
+    ])
+    error_message = "Metric-threshold policies must not use the log-match-only notification rate limit."
+  }
+
+  assert {
     condition = one([
       for environment in google_cloud_run_v2_job.scraper[0].template[0].template[0].containers[0].env :
       environment.value
@@ -68,5 +78,14 @@ run "keeps_monitoring_actionable_and_bounded" {
       strcontains(google_monitoring_dashboard.operations.dashboard_json, "Application Storage size and object count")
     )
     error_message = "The operations dashboard must cover scraper, database, and storage health."
+  }
+
+
+  assert {
+    condition = (
+      !strcontains(google_monitoring_dashboard.operations.dashboard_json, "\"x\":") &&
+      !strcontains(google_monitoring_dashboard.operations.dashboard_json, "\"y\":")
+    )
+    error_message = "Mosaic tiles must use automatic placement; the API does not accept x/y coordinates."
   }
 }

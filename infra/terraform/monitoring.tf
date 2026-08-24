@@ -195,10 +195,6 @@ resource "google_monitoring_alert_policy" "scraper_application_failure" {
 
   alert_strategy {
     auto_close = "86400s"
-
-    notification_rate_limit {
-      period = "3600s"
-    }
   }
 
   notification_channels = google_monitoring_notification_channel.email[*].name
@@ -235,10 +231,6 @@ resource "google_monitoring_alert_policy" "scraper_platform_failure" {
 
   alert_strategy {
     auto_close = "86400s"
-
-    notification_rate_limit {
-      period = "3600s"
-    }
   }
 
   notification_channels = google_monitoring_notification_channel.email[*].name
@@ -275,10 +267,6 @@ resource "google_monitoring_alert_policy" "suspicious_listing_count" {
 
   alert_strategy {
     auto_close = "86400s"
-
-    notification_rate_limit {
-      period = "3600s"
-    }
   }
 
   notification_channels = google_monitoring_notification_channel.email[*].name
@@ -315,10 +303,6 @@ resource "google_monitoring_alert_policy" "cloud_sql_disk" {
 
   alert_strategy {
     auto_close = "86400s"
-
-    notification_rate_limit {
-      period = "21600s"
-    }
   }
 
   notification_channels = google_monitoring_notification_channel.email[*].name
@@ -333,8 +317,6 @@ resource "google_monitoring_dashboard" "operations" {
       columns = 12
       tiles = [
         {
-          x      = 0
-          y      = 0
           width  = 6
           height = 4
           widget = {
@@ -362,8 +344,6 @@ resource "google_monitoring_dashboard" "operations" {
           }
         },
         {
-          x      = 6
-          y      = 0
           width  = 6
           height = 4
           widget = {
@@ -389,8 +369,6 @@ resource "google_monitoring_dashboard" "operations" {
           }
         },
         {
-          x      = 0
-          y      = 4
           width  = 12
           height = 4
           widget = {
@@ -418,8 +396,6 @@ resource "google_monitoring_dashboard" "operations" {
           }
         },
         {
-          x      = 0
-          y      = 8
           width  = 6
           height = 4
           widget = {
@@ -447,8 +423,6 @@ resource "google_monitoring_dashboard" "operations" {
           }
         },
         {
-          x      = 6
-          y      = 8
           width  = 6
           height = 4
           widget = {
@@ -476,8 +450,6 @@ resource "google_monitoring_dashboard" "operations" {
           }
         },
         {
-          x      = 0
-          y      = 12
           width  = 12
           height = 4
           widget = {
