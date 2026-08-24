@@ -84,8 +84,10 @@ run "keeps_monitoring_actionable_and_bounded" {
   assert {
     condition = (
       !strcontains(google_monitoring_dashboard.operations.dashboard_json, "\"x\":") &&
-      !strcontains(google_monitoring_dashboard.operations.dashboard_json, "\"y\":")
+      !strcontains(google_monitoring_dashboard.operations.dashboard_json, "\"y\":") &&
+      strcontains(google_monitoring_dashboard.operations.dashboard_json, "\"xPos\":") &&
+      strcontains(google_monitoring_dashboard.operations.dashboard_json, "\"yPos\":")
     )
-    error_message = "Mosaic tiles must use automatic placement; the API does not accept x/y coordinates."
+    error_message = "Mosaic tiles must use the API's xPos/yPos fields, never unsupported x/y fields."
   }
 }

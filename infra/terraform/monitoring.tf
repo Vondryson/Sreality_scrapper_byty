@@ -317,6 +317,8 @@ resource "google_monitoring_dashboard" "operations" {
       columns = 12
       tiles = [
         {
+          xPos   = 0
+          yPos   = 0
           width  = 6
           height = 4
           widget = {
@@ -344,6 +346,8 @@ resource "google_monitoring_dashboard" "operations" {
           }
         },
         {
+          xPos   = 6
+          yPos   = 0
           width  = 6
           height = 4
           widget = {
@@ -369,6 +373,8 @@ resource "google_monitoring_dashboard" "operations" {
           }
         },
         {
+          xPos   = 0
+          yPos   = 4
           width  = 12
           height = 4
           widget = {
@@ -396,6 +402,8 @@ resource "google_monitoring_dashboard" "operations" {
           }
         },
         {
+          xPos   = 0
+          yPos   = 8
           width  = 6
           height = 4
           widget = {
@@ -423,6 +431,8 @@ resource "google_monitoring_dashboard" "operations" {
           }
         },
         {
+          xPos   = 6
+          yPos   = 8
           width  = 6
           height = 4
           widget = {
@@ -450,6 +460,8 @@ resource "google_monitoring_dashboard" "operations" {
           }
         },
         {
+          xPos   = 0
+          yPos   = 12
           width  = 12
           height = 4
           widget = {
