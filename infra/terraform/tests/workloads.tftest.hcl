@@ -56,6 +56,22 @@ run "keeps_cloud_run_within_mvp_guardrails" {
 
   assert {
     condition = (
+      one([
+        for environment in google_cloud_run_v2_job.scraper[0].template[0].template[0].containers[0].env :
+        environment.value
+        if environment.name == "SREALITY_ROUTES_PROJECT_ID"
+      ]) == "sreality-scrapper-504307" &&
+      length([
+        for environment in google_cloud_run_v2_job.scraper[0].template[0].template[0].containers[0].env :
+        environment
+        if environment.name == "SREALITY_ROUTES_ACCESS_TOKEN"
+      ]) == 0
+    )
+    error_message = "The scraper must use its ADC identity for Routes in the approved project without a static token environment variable."
+  }
+
+  assert {
+    condition = (
       google_cloud_run_v2_service_iam_member.public_frontend[0].member == "allUsers" &&
       google_cloud_run_v2_service_iam_member.public_api_transport[0].member == "allUsers"
     )

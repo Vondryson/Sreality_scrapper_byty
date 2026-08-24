@@ -291,6 +291,10 @@ resource "google_cloud_run_v2_job" "scraper" {
           value = var.project_id
         }
         env {
+          name  = "SREALITY_ROUTES_PROJECT_ID"
+          value = var.project_id
+        }
+        env {
           name  = "SREALITY_STORAGE_BUCKET"
           value = google_storage_bucket.application_data.name
         }

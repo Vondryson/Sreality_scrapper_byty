@@ -6,7 +6,7 @@ import argparse
 import json
 import sys
 import time
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import TextIO
@@ -23,6 +23,7 @@ from sreality_tracker.core.settings import (
 )
 from sreality_tracker.db.models import ScrapeRunStatus, ScrapeRunTrigger
 from sreality_tracker.db.session import create_database_engine, create_session_factory
+from sreality_tracker.distances.auth import GoogleAdcAccessTokenProvider
 from sreality_tracker.distances.road import BackfillResult, RoadDistanceEnricher
 from sreality_tracker.distances.routes import RoutesClient
 from sreality_tracker.scraper.client import SrealityClient
@@ -211,18 +212,28 @@ def _run_routes_backfill(settings: Settings, *, limit: int) -> BackfillResult:
         engine.dispose()
 
 
+def _static_access_token_provider(token: str) -> Callable[[], str]:
+    def provide_access_token() -> str:
+        return token
+
+    return provide_access_token
+
+
 def _routes_client(settings: Settings, *, required: bool = False) -> RoutesClient | None:
     token = settings.routes_access_token_value()
     project_id = settings.routes_project_id
-    if token is None or project_id is None:
+    if project_id is None:
         if required:
-            raise ConfigurationError(
-                "Routes backfill requires routes_project_id and a short-lived routes_access_token"
-            )
+            raise ConfigurationError("Routes backfill requires routes_project_id")
         return None
+    access_token_provider: Callable[[], str]
+    if token is None:
+        access_token_provider = GoogleAdcAccessTokenProvider(project_id)
+    else:
+        access_token_provider = _static_access_token_provider(token)
     return RoutesClient(
         project_id=project_id,
-        access_token_provider=lambda: token,
+        access_token_provider=access_token_provider,
         timeout_seconds=settings.http_timeout_seconds,
         max_attempts=settings.routes_max_attempts,
         request_limit=settings.routes_daily_request_limit,

@@ -3,11 +3,11 @@
 ## Aktuální stav
 
 - Poslední aktualizace: 2026-08-24
-- Aktuální milník: M4 – GCP infrastruktura a automatizovaný provoz
-- Aktuální hlavní task: žádný – `M4-08` je uzavřeno
-- Následující doporučený task: `M5-01` – Ověřit první kompletní produkční běh
+- Aktuální milník: M5 – End-to-end validace a předání MVP
+- Aktuální hlavní task: `M5-01` – Ověřit první kompletní produkční běh
+- Následující doporučený task: dokončit audit dnešního plánovaného běhu
 - Blokátory: žádné
-- Souhrn: 39 dokončeno, 0 rozpracováno, 0 blokováno, 4 čekají
+- Souhrn: 39 dokončeno, 1 rozpracováno, 0 blokováno, 3 čekají
 
 ## Legenda
 
@@ -78,11 +78,22 @@ Najednou má být `[~]` označen nejvýše jeden hlavní task. Dílčí paraleln
 
 ## M5 – End-to-end validace a předání MVP
 
-- [ ] `M5-01` – Ověřit první kompletní produkční běh.
+- [~] `M5-01` – Ověřit první kompletní produkční běh.
 - [ ] `M5-02` – Provést failure, security a restore drill.
 - [ ] `M5-03` – Uzavřít MVP checklist a provozní dokumentaci.
 
 ## Pracovní poznámky k aktivnímu tasku
+
+### 2026-08-24 – `M5-01`
+
+- Plán: dohledat pondělní Scheduler pokus a jeho Cloud Run execution, ověřit finální výsledek v logu a `scrape_runs`, počty obou kategorií, události, raw payloady, vzdálenosti a konzistenci produkčního API/UI.
+- Rozsah: přednostně read-only GCP logy a metadata, následně read-only databázový/API audit; žádný nový scraper běh se nespustí, pokud dnešní plánovaný běh existuje nebo jeho stav není jednoznačný.
+- Rizika a předpoklady: Scheduler běží v pondělí `03:00 Europe/Prague` (`01:00 UTC` v letním čase); detailní stránky Sreality mohou používat známý search-result fallback, který není chybou, pokud je běh kompletní a bez parser/storage chyb.
+- Scheduler a execution: pokus `2026-08-24T01:00:00Z` vrátil HTTP 200 a vytvořil execution `sreality-tracker-scraper-ktgjt`; job skončil za 15 minut s `succeededCount=1`. Běh `3fd7396b-d729-40b9-884a-85ae28ce5198` má stav `succeeded`, 3 564 nalezených, 35 nových, 16 změněných, 54 deaktivovaných, 0 chyb a kompletní kategorie (2 391 chata, 1 173 chalupa). Dvě warning události jsou očekávaný fallback z nedostupného detailu na data vyhledávání.
+- Datová konzistence: databáze obsahuje přesně 3 564 unikátních observations a raw referencí tohoto běhu; GCS prefix obsahuje přesně 3 564 gzip objektů. Události odpovídají výsledku běhu (35 vytvoření, 54 deaktivací, 16 detailových změn a 4 zlevnění). Produkční frontend, API liveness/readiness vrací 200 a anonymní listings správně 401.
+- Nalezená mezera: všech 3 564 aktivních nabídek má souřadnice a vzdušnou vzdálenost, ale žádná nemá silniční vzdálenost. Produkční job neměl `SREALITY_ROUTES_PROJECT_ID` a CLI podporovalo jen ručně dodaný krátkodobý token, který není vhodný pro Cloud Run.
+- Oprava k nasazení: scraper nyní získává krátkodobý Routes token přes Application Default Credentials své service account; statický token zůstává pouze lokální explicitní override. Terraform předává ID vlastního projektu a regresní test zakazuje vložení access tokenu do jobu. Ruff, formátování, mypy, 119 unit testů, `terraform validate` a všechny čtyři Terraform testy procházejí.
+- Zbývá: vytvořit a kontrolovaně nasadit nový immutable scraper image, jedním omezeným backfill požadavkem ověřit produkční ADC/Routes zápis, rozhodnout bezpečné tempo doplnění zbývajících silničních vzdáleností a dokončit přihlášenou vizuální kontrolu UI. In-app browser není v této relaci připojený, proto UI důkaz vyžaduje kontrolu vlastníkem.
 
 ### 2026-08-24 – `M4-08`
 
