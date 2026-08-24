@@ -4,10 +4,10 @@
 
 - Poslední aktualizace: 2026-08-24
 - Aktuální milník: M4 – GCP infrastruktura a automatizovaný provoz
-- Aktuální hlavní task: `M4-07` – Přidat monitoring, e-mail a obnovu
-- Následující doporučený task: potvrdit doručení syntetického failure e-mailu a uzavřít M4-07
+- Aktuální hlavní task: žádný – `M4-07` je uzavřeno
+- Následující doporučený task: `M4-08` – Nastavit a ověřit rozpočtové pojistky
 - Blokátory: žádné
-- Souhrn: 37 dokončeno, 1 rozpracováno, 0 blokováno, 5 čeká
+- Souhrn: 38 dokončeno, 0 rozpracováno, 0 blokováno, 5 čeká
 
 ## Legenda
 
@@ -73,7 +73,7 @@ Najednou má být `[~]` označen nejvýše jeden hlavní task. Dílčí paraleln
 - [x] `M4-04` – Vytvořit IAM, service accounts a secrets.
 - [x] `M4-05` – Nasadit Cloud Run services a scraper job.
 - [x] `M4-06` – Přidat Scheduler, ruční běh a CI/CD.
-- [~] `M4-07` – Přidat monitoring, e-mail a obnovu.
+- [x] `M4-07` – Přidat monitoring, e-mail a obnovu.
 - [ ] `M4-08` – Nastavit a ověřit rozpočtové pojistky.
 
 ## M5 – End-to-end validace a předání MVP
@@ -100,6 +100,7 @@ Najednou má být `[~]` označen nejvýše jeden hlavní task. Dílčí paraleln
 - Dashboard apply: dashboard byl vytvořen, následný drift check ale odhalil API normalizaci výchozí osy `targetAxis=Y1` a vynechávání nulových `xPos`/`yPos`. Deklarace byla srovnána s vraceným kontraktem; serverová `name`/`etag` pole provider podle svého JSON diff pravidla ignoruje, jakmile nezůstává jiná věcná změna.
 - Finální produkční stav: nový scraper image `sha256:4fd885185625f23e9f0443942dfb5ee985a4c427825c73165c708ff1a46b8dab`, práh 2 500, všech 13 metrik, čtyři aktivní alert policies, e-mailový kanál a dashboard jsou nasazené. Terraform po normalizaci dashboard JSON hlásí `No changes`.
 - Provozní ověření: read-only execution `sreality-tracker-scraper-kls56` na novém image skončila `succeededCount=1` a emitovala `status=ready, mode=read_only`. Syntetická událost `monitoring:test:20260824-01` dorazila do správného `cloud_run_job` logu a failure metrika vrací hodnotu `1`; čeká se pouze na potvrzení skutečného doručení e-mailu vlastníkem.
+- Uzavření: vlastník potvrdil doručení e-mailu z policy `Sreality scraper: unsuccessful run` pro metriku `logging.googleapis.com/user/sreality-tracker-scrape-failures`, job `sreality-tracker-scraper` a syntetický log `sreality-monitoring-test`. Celý incidentní řetězec je tím prakticky ověřený a `M4-07` je dokončeno; rozpočty, kvóty a 30denní retence pokračují v `M4-08`.
 
 ### 2026-08-23 – `M4-05`
 
