@@ -5,7 +5,7 @@
 - Poslední aktualizace: 2026-08-24
 - Aktuální milník: M4 – GCP infrastruktura a automatizovaný provoz
 - Aktuální hlavní task: `M4-07` – Přidat monitoring, e-mail a obnovu
-- Následující doporučený task: commit/push, immutable scraper image a schválený produkční M4-07 apply
+- Následující doporučený task: potvrdit doručení syntetického failure e-mailu a uzavřít M4-07
 - Blokátory: žádné
 - Souhrn: 37 dokončeno, 1 rozpracováno, 0 blokováno, 5 čeká
 
@@ -98,6 +98,8 @@ Najednou má být `[~]` označen nejvýše jeden hlavní task. Dílčí paraleln
 - První oprava: rate-limit bloky a nepodporovaná `x`/`y` pole byly odstraněny a oba případy dostaly regresní Terraform guardrail. `terraform validate` a všechny tři testovací sady po opravě znovu prošly.
 - Druhý apply: všechny čtyři alert policies byly vytvořeny. Dashboard bez pozic API odmítlo kvůli překryvu tiles; kontrakt vyžaduje pole `xPos`/`yPos` (původní `x`/`y` jsou neplatná). Poslední oprava i guardrail se týkají už pouze dashboardu.
 - Dashboard apply: dashboard byl vytvořen, následný drift check ale odhalil API normalizaci výchozí osy `targetAxis=Y1` a vynechávání nulových `xPos`/`yPos`. Deklarace byla srovnána s vraceným kontraktem; serverová `name`/`etag` pole provider podle svého JSON diff pravidla ignoruje, jakmile nezůstává jiná věcná změna.
+- Finální produkční stav: nový scraper image `sha256:4fd885185625f23e9f0443942dfb5ee985a4c427825c73165c708ff1a46b8dab`, práh 2 500, všech 13 metrik, čtyři aktivní alert policies, e-mailový kanál a dashboard jsou nasazené. Terraform po normalizaci dashboard JSON hlásí `No changes`.
+- Provozní ověření: read-only execution `sreality-tracker-scraper-kls56` na novém image skončila `succeededCount=1` a emitovala `status=ready, mode=read_only`. Syntetická událost `monitoring:test:20260824-01` dorazila do správného `cloud_run_job` logu a failure metrika vrací hodnotu `1`; čeká se pouze na potvrzení skutečného doručení e-mailu vlastníkem.
 
 ### 2026-08-23 – `M4-05`
 
